@@ -8,7 +8,7 @@ import "./revision.css";
 export const metadata: Metadata = {
   title: "Ruang Bogor: Peta Kelayakhunian 68 Kelurahan Kota Bogor",
   description:
-    "Peta dan analisis tingkat kelayakhunian 68 kelurahan dan 6 kecamatan di Kota Bogor berdasarkan 10 indikator spasial dan atribut.",
+    "Peta dan analisis tingkat kelayakhunian 68 kelurahan dan 6 kecamatan di Kota Bogor berdasarkan 12 indikator spasial dan atribut.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

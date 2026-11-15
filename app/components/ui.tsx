@@ -282,7 +282,7 @@ export function Footer() {
       <div>
         <span>Rujukan &amp; metode</span>
         <Link href="/metodologi">Metodologi perhitungan</Link>
-        <Link href="/metodologi#sumber">Daftar 10 indikator &amp; sumber</Link>
+        <Link href="/metodologi#sumber">Daftar 12 indikator &amp; sumber</Link>
         <Link href="/dashboard">Statistik agregat kota</Link>
       </div>
       <div className="footer-note">

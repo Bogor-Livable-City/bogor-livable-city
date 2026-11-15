@@ -8,8 +8,18 @@ import L from "leaflet";
 import { useEffect, useRef } from "react";
 import type { Feature, FeatureCollection, Geometry, Position } from "geojson";
 import { classify, fmt, type KelurahanProps, type ThemeKey } from "../lib/livability";
+import { badgeHtml, SIMBOL_FASKES, SIMBOL_SEKOLAH, UKURAN_PETA, type SimbolTitik } from "../lib/simbol";
 
-export type OverlayKey = "labels" | "faskes" | "jangkauan" | "sekolah" | "jalan" | "kecamatan";
+export type OverlayKey =
+  | "labels"
+  | "kecamatan"
+  | "rs"
+  | "puskesmas"
+  | "klinik"
+  | "sd"
+  | "smp"
+  | "sma_smk"
+  | "jalan";
 export type Basemap = "light" | "satellite" | "osm" | "topo";
 
 type Props = {
@@ -25,17 +35,21 @@ type Props = {
 
 const BASEMAPS: Record<
   Basemap,
-  { url: string; labelUrl?: string; attribution: string; maxZoom: number }
+  { url: string; labelUrl?: string; attribution: string; maxZoom: number; maxNativeZoom?: number }
 > = {
+  // CARTO menutup basemap gratisnya; tile-nya sekarang dibalas gambar "API key required".
   light: {
-    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    labelUrl:
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
+    attribution: "Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors",
     maxZoom: 19,
+    maxNativeZoom: 16, // Esri Light Gray berhenti di level 16, selebihnya tile diperbesar
   },
   satellite: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    labelUrl: "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png",
+    labelUrl:
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri, Source: Esri, Maxar, Earthstar Geographics",
     maxZoom: 19,
   },
@@ -52,18 +66,6 @@ const BASEMAPS: Record<
   },
 };
 
-const FASKES_STYLE: Record<string, { color: string; label: string; radius: number }> = {
-  rs: { color: "#b8432f", label: "Rumah sakit", radius: 6 },
-  puskesmas: { color: "#0e5b53", label: "Puskesmas", radius: 5 },
-  klinik: { color: "#5a7fb0", label: "Klinik", radius: 4 },
-};
-
-const JANGKAUAN_STYLE: Record<string, L.PathOptions> = {
-  rs: { color: "#b8432f", weight: 1, fillColor: "#b8432f", fillOpacity: 0.06, dashArray: "4 4" },
-  puskesmas: { color: "#0e5b53", weight: 1, fillColor: "#0e5b53", fillOpacity: 0.12 },
-  klinik: { color: "#5a7fb0", weight: 1, fillColor: "#5a7fb0", fillOpacity: 0.1 },
-  blank_spot: { color: "#c0392b", weight: 1.5, fillColor: "#e74c3c", fillOpacity: 0.35 },
-};
 
 const ROAD_WEIGHT: Record<string, number> = {
   "Jalan Tol Dua Jalur Dengan Pemisah Fisik": 3.2,
@@ -143,11 +145,12 @@ export default function LeafletMap({
     L.control.scale({ position: "bottomright", imperial: false }).addTo(map);
 
     map.createPane("choropleth").style.zIndex = "400";
-    map.createPane("jangkauan").style.zIndex = "410";
     map.createPane("jalan").style.zIndex = "420";
     map.createPane("batas").style.zIndex = "430";
     map.createPane("regionLabels").style.zIndex = "450";
-    map.getPane("jangkauan")!.style.pointerEvents = "none";
+    // Titik fasilitas di atas segalanya; sebelumnya ikut overlayPane bawaan (400)
+    // dan tertimbun poligon choropleth yang panenya dibuat belakangan.
+    map.createPane("titik").style.zIndex = "470";
     map.getPane("jalan")!.style.pointerEvents = "none";
     map.getPane("batas")!.style.pointerEvents = "none";
 
@@ -220,11 +223,13 @@ export default function LeafletMap({
     L.tileLayer(cfg.url, {
       attribution: cfg.attribution,
       maxZoom: cfg.maxZoom,
+      maxNativeZoom: cfg.maxNativeZoom,
       subdomains: "abcd",
     }).addTo(group);
     if (cfg.labelUrl) {
       L.tileLayer(cfg.labelUrl, {
         maxZoom: cfg.maxZoom,
+        maxNativeZoom: cfg.maxNativeZoom,
         subdomains: "abcd",
         opacity: 0.85,
       }).addTo(group);
@@ -257,6 +262,14 @@ export default function LeafletMap({
       map.removeLayer(labelGroup);
       return;
     }
+
+    // Garis batas kelurahan ikut tombol yang sama dengan namanya, seperti kecamatan.
+    L.geoJSON(data, {
+      pane: "batas",
+      interactive: false,
+      filter: (f) => !visibleKodes || visibleKodes.has(f.properties.kode),
+      style: { color: "#2f6f66", weight: 1, fill: false, opacity: 0.7 },
+    }).addTo(labelGroup);
 
     for (const f of data.features) {
       const p = f.properties;
@@ -310,7 +323,7 @@ export default function LeafletMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    (["faskes", "jangkauan", "sekolah", "jalan", "kecamatan"] as OverlayKey[]).forEach(async (key) => {
+    (["rs", "puskesmas", "klinik", "sd", "smp", "sma_smk", "jalan", "kecamatan"] as OverlayKey[]).forEach(async (key) => {
       const existing = overlayRefs.current[key];
       if (!overlays[key]) {
         if (existing) map.removeLayer(existing);
@@ -336,60 +349,74 @@ async function fetchJson(name: string) {
   return res.json() as Promise<FeatureCollection>;
 }
 
+// Tidak semua titik koordinatnya hasil survei. Kolom `kualitas` dibawa dari gpkg
+// (lihat gis/sql/sekolah.sql), dan pembaca perlu tahu titik mana yang letaknya
+// cuma perkiraan supaya tidak menganggap semuanya sama telitinya.
+const CATATAN_LETAK: Record<string, string> = {
+  meragukan: "Letak perkiraan, hasil geocode",
+  fallback: "Letak perkiraan dari kelurahan",
+};
+
+function catatanLetak(kualitas?: string) {
+  const teks = CATATAN_LETAK[kualitas ?? ""];
+  return teks ? `<br/><small>${teks}</small>` : "";
+}
+
+// Satu titik fasilitas = badge ikon di pane "titik", dengan ringkasan saat
+// disorot dan rincian saat diklik.
+function layerTitik(
+  fc: FeatureCollection,
+  jenis: string,
+  s: SimbolTitik,
+  tambahan: (p: Record<string, unknown>) => string
+) {
+  const ikon = L.divIcon({
+    className: "titik-ikon",
+    html: badgeHtml(s),
+    iconSize: [UKURAN_PETA, UKURAN_PETA],
+    iconAnchor: [UKURAN_PETA / 2, UKURAN_PETA / 2],
+  });
+  return L.geoJSON(fc, {
+    filter: (f) => f.properties?.jenis === jenis,
+    pointToLayer: (_f, latlng) => L.marker(latlng, { icon: ikon, pane: "titik", riseOnHover: true }),
+    onEachFeature: (f, layer) => {
+      const p = (f.properties ?? {}) as Record<string, unknown>;
+      const nama = escapeHtml(String(p.nama ?? "-"));
+      const tempat = `${escapeHtml(String(p.kelurahan ?? ""))}, ${escapeHtml(String(p.kecamatan ?? ""))}`;
+      layer.bindTooltip(`<b>${nama}</b><br/><span>${s.label}</span><br/><span>${tempat}</span>`, {
+        direction: "top",
+        offset: [0, -UKURAN_PETA / 2],
+        className: "rb-tooltip",
+      });
+      layer.bindPopup(
+        `<b>${nama}</b><br/>${s.label}${tambahan(p)}<br/><small>${tempat}</small>${catatanLetak(p.kualitas as string)}`
+      );
+    },
+  });
+}
+
 async function buildOverlay(key: OverlayKey): Promise<L.Layer> {
   switch (key) {
     case "labels":
       return L.layerGroup();
-    case "faskes": {
-      const fc = await fetchJson("faskes");
-      return L.geoJSON(fc, {
-        pointToLayer: (f, latlng) => {
-          const s = FASKES_STYLE[f.properties?.jenis] ?? FASKES_STYLE.klinik;
-          return L.circleMarker(latlng, { radius: s.radius, color: "#fff", weight: 1.5, fillColor: s.color, fillOpacity: 1 });
-        },
-        onEachFeature: (f, layer) => {
-          const p = f.properties ?? {};
-          const s = FASKES_STYLE[p.jenis] ?? FASKES_STYLE.klinik;
-          layer.bindPopup(
-            `<b>${escapeHtml(p.nama ?? "-")}</b><br/>${s.label}<br/><small>${escapeHtml(p.kelurahan ?? "")}, ${escapeHtml(p.kecamatan ?? "")}</small>`
-          );
-        },
-      });
-    }
-    case "jangkauan": {
-      const fc = await fetchJson("JANGKAUAN_PUSKESMAS_RUMAHSAKIT");
-      const order = ["rs", "klinik", "puskesmas", "blank_spot"];
-      fc.features.sort((a, b) => order.indexOf(a.properties?.kode) - order.indexOf(b.properties?.kode));
-      return L.geoJSON(fc, {
-        pane: "jangkauan",
-        style: (f) => ({ ...JANGKAUAN_STYLE[f?.properties?.kode] }),
-      });
-    }
-    case "sekolah": {
-      const fc = await fetchJson("sekolah");
-      const SEKOLAH_STYLE: Record<string, { color: string; label: string }> = {
-        sd: { color: "#d8a85f", label: "SD" },
-        smp: { color: "#4c8e72", label: "SMP" },
-        sma_smk: { color: "#7a5ea8", label: "SMA/SMK" },
-      };
-      return L.geoJSON(fc, {
-        pointToLayer: (f, latlng) => {
-          const s = SEKOLAH_STYLE[f.properties?.jenis] ?? SEKOLAH_STYLE.sd;
-          return L.circleMarker(latlng, { radius: 4, color: "#fff", weight: 1, fillColor: s.color, fillOpacity: 0.9 });
-        },
-        onEachFeature: (f, layer) => {
-          const p = f.properties ?? {};
-          const s = SEKOLAH_STYLE[p.jenis] ?? SEKOLAH_STYLE.sd;
-          layer.bindPopup(
-            `<b>${escapeHtml(p.nama ?? "-")}</b><br/>${s.label} · NPSN ${p.npsn ?? "-"}<br/><small>${escapeHtml(p.kelurahan ?? "")}, ${escapeHtml(p.kecamatan ?? "")}</small>`
-          );
-        },
-      });
-    }
+    case "rs":
+    case "puskesmas":
+    case "klinik":
+      return layerTitik(await fetchJson("faskes"), key, SIMBOL_FASKES[key], (p) => "");
+    case "sd":
+    case "smp":
+    case "sma_smk":
+      return layerTitik(await fetchJson("sekolah"), key, SIMBOL_SEKOLAH[key], (p) =>
+        p.npsn ? ` · NPSN ${escapeHtml(String(p.npsn))}` : ""
+      );
     case "jalan": {
       const fc = await fetchJson("jalan");
       return L.geoJSON(fc, {
         pane: "jalan",
+        // 10 dari 4.236 fitur bukan garis (Point, MultiPoint, GeometryCollection).
+        // Tanpa saringan ini Leaflet menggambarnya sebagai marker default yang ikonnya
+        // tidak termuat, jadi yang tampil teks "Marker" berserakan di peta.
+        filter: (f) => (f.geometry?.type ?? "").includes("Line"),
         style: (f) => {
           const w = ROAD_WEIGHT[f?.properties?.kelas] ?? 0.6;
           return { color: w >= 2 ? "#8a5a3c" : "#6f6f6f", weight: w, opacity: w >= 2 ? 0.9 : 0.55 };

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { bogorSvgPaths } from "../lib/bogor-svg-paths";
 import { kelurahanData } from "../kelurahan-data";
 import { classes, scoreToColor, toSlug } from "../lib/livability";
-import { Icon } from "./ui";
+
 
 const kelurahanBySlug = new Map(
   kelurahanData.map((k) => [toSlug(k.kelurahan), k])
@@ -228,10 +228,9 @@ export function ScoreLegend({
   title?: string;
 }) {
   return (
-    <div className="legend">
+    <div className="legend-isi">
       <div className="legend-title">
         <span>{title}</span>
-        <Icon name="info" size={15} />
       </div>
       <div className="legend-bar" />
       <div className="legend-values">
@@ -252,10 +251,6 @@ export function ScoreLegend({
             <b>{c.range}</b>
           </div>
         ))}
-      </div>
-      <div className="legend-note">
-        <i />
-        68 kelurahan · interval setara (0,00 sampai 1,00)
       </div>
     </div>
   );

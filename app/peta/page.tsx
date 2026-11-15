@@ -6,9 +6,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FeatureCollection, Geometry } from "geojson";
 import type { Basemap, OverlayKey } from "../components/leaflet-map";
 import Map3D from "../components/map-3d";
-import { ScoreLegend } from "../components/map-visual";
+import { LegendaPeta } from "../components/legenda";
+import { SelectAnimasi } from "../components/select";
 import { Header, Icon } from "../components/ui";
 import { districts, kelurahanData } from "../data";
+import { SIMBOL_FASKES, SIMBOL_SEKOLAH } from "../lib/simbol";
 import {
   classes,
   classify,
@@ -29,13 +31,35 @@ const LeafletMap = dynamic(() => import("../components/leaflet-map"), {
   ),
 });
 
-const OVERLAY_ITEMS: { key: OverlayKey; label: string; symbol: string }[] = [
-  { key: "labels", label: "Nama 68 kelurahan", symbol: "symbol-0" },
-  { key: "kecamatan", label: "Batas & nama 6 kecamatan", symbol: "symbol-0" },
-  { key: "faskes", label: "Fasilitas kesehatan (120)", symbol: "symbol-1" },
-  { key: "jangkauan", label: "Jangkauan faskes & blank spot", symbol: "symbol-1" },
-  { key: "sekolah", label: "Fasilitas pendidikan (556)", symbol: "symbol-2" },
-  { key: "jalan", label: "Jaringan jalan RBI", symbol: "symbol-2" },
+// Grup yang punya judul tampil sebagai dropdown; sisanya jadi baris biasa.
+// Item fasilitas memakai warna dari lib/simbol supaya seragam dengan titik di peta.
+const OVERLAY_GROUPS: {
+  judul?: string;
+  items: { key: OverlayKey; label: string; symbol?: string; warna?: string }[];
+}[] = [
+  {
+    items: [
+      { key: "labels", label: "Nama dan Batas Kelurahan", symbol: "symbol-0" },
+      { key: "kecamatan", label: "Nama dan Batas Kecamatan", symbol: "symbol-0" },
+      { key: "jalan", label: "Jaringan Jalan", symbol: "symbol-jalan" },
+    ],
+  },
+  {
+    judul: "Fasilitas Kesehatan",
+    items: [
+      { key: "rs", label: SIMBOL_FASKES.rs.label, warna: SIMBOL_FASKES.rs.warna },
+      { key: "puskesmas", label: SIMBOL_FASKES.puskesmas.label, warna: SIMBOL_FASKES.puskesmas.warna },
+      { key: "klinik", label: SIMBOL_FASKES.klinik.label, warna: SIMBOL_FASKES.klinik.warna },
+    ],
+  },
+  {
+    judul: "Fasilitas Pendidikan",
+    items: [
+      { key: "sd", label: SIMBOL_SEKOLAH.sd.label, warna: SIMBOL_SEKOLAH.sd.warna },
+      { key: "smp", label: SIMBOL_SEKOLAH.smp.label, warna: SIMBOL_SEKOLAH.smp.warna },
+      { key: "sma_smk", label: SIMBOL_SEKOLAH.sma_smk.label, warna: SIMBOL_SEKOLAH.sma_smk.warna },
+    ],
+  },
 ];
 
 export default function MapPage() {
@@ -47,9 +71,12 @@ export default function MapPage() {
   const [overlays, setOverlays] = useState<Record<OverlayKey, boolean>>({
     labels: true,
     kecamatan: true,
-    faskes: true,
-    jangkauan: false,
-    sekolah: false,
+    rs: true,
+    puskesmas: true,
+    klinik: true,
+    sd: false,
+    smp: false,
+    sma_smk: false,
     jalan: false,
   });
 
@@ -202,9 +229,8 @@ export default function MapPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Cari kecamatan atau kelurahan"
-              placeholder="Cari kelurahan / kecamatan..."
+              placeholder="Cari Kelurahan / Kecamatan"
             />
-            <kbd aria-hidden="true">Ctrl K</kbd>
           </div>
           {searchQuery.trim().length > 0 && (
             <div className="search-results" role="region" aria-label="Hasil pencarian">
@@ -264,19 +290,13 @@ export default function MapPage() {
               <label className="control-label" htmlFor="theme-select">
                 Peta tematik
               </label>
-              <div className="select-wrap">
-                <select
-                  id="theme-select"
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value as ThemeKey)}
-                >
-                  {themes.map((t) => (
-                    <option key={t.key} value={t.key}>
-                      {t.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectAnimasi
+                id="theme-select"
+                label="Peta tematik"
+                value={theme}
+                options={themes.map((t) => ({ value: t.key, label: t.label }))}
+                onChange={(v) => setTheme(v as ThemeKey)}
+              />
 
               <label className="opacity-row">
                 <span>Transparansi poligon</span>
@@ -294,20 +314,34 @@ export default function MapPage() {
               </label>
 
               <p className="control-label">Layer &amp; label daerah</p>
-              {OVERLAY_ITEMS.map((item) => (
-                <label className="toggle-row" key={item.key}>
-                  <span>
-                    <i className={`layer-symbol ${item.symbol}`} />
-                    {item.label}
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={overlays[item.key]}
-                    onChange={() => toggleOverlay(item.key)}
-                  />
-                  <b />
-                </label>
-              ))}
+              {OVERLAY_GROUPS.map((grup) => {
+                const baris = grup.items.map((item) => (
+                  <label className="toggle-row" key={item.key}>
+                    <span>
+                      <i
+                        className={`layer-symbol ${item.symbol ?? ""}`}
+                        style={item.warna ? { background: item.warna } : undefined}
+                      />
+                      {item.label}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={overlays[item.key]}
+                      onChange={() => toggleOverlay(item.key)}
+                    />
+                    <b />
+                  </label>
+                ));
+                if (!grup.judul) return baris;
+                return (
+                  <details className="layer-group" key={grup.judul}>
+                    <summary>
+                      <span>{grup.judul}</span>
+                    </summary>
+                    {baris}
+                  </details>
+                );
+              })}
 
               <p className="control-label">Mode peta dasar (2D)</p>
               <div className="basemap-grid">
@@ -367,53 +401,47 @@ export default function MapPage() {
             </div>
           ) : (
             <div className="filter-panel">
-              <label>
-                Kecamatan
-                <select
+              <div className="filter-field">
+                <span>Kecamatan</span>
+                <SelectAnimasi
+                  label="Kecamatan"
                   value={filterKecamatan}
-                  onChange={(e) => {
-                    setFilterKecamatan(e.target.value);
+                  options={[
+                    { value: "Semua kecamatan", label: "Semua kecamatan" },
+                    ...districts.map((d) => ({ value: d.name, label: `${d.name} (${d.villages})` })),
+                  ]}
+                  onChange={(v) => {
+                    setFilterKecamatan(v);
                     setFilterKelurahan("Semua kelurahan");
                   }}
-                >
-                  <option>Semua kecamatan</option>
-                  {districts.map((d) => (
-                    <option key={d.name} value={d.name}>
-                      {d.name} ({d.villages})
-                    </option>
-                  ))}
-                </select>
-              </label>
+                />
+              </div>
 
-              <label>
-                Kelurahan
-                <select
+              <div className="filter-field">
+                <span>Kelurahan</span>
+                <SelectAnimasi
+                  label="Kelurahan"
                   value={filterKelurahan}
-                  onChange={(e) => setFilterKelurahan(e.target.value)}
-                >
-                  <option>Semua kelurahan</option>
-                  {kelurahanOptions.map((k) => (
-                    <option key={k.kode} value={k.kelurahan}>
-                      {k.kelurahan}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  options={[
+                    { value: "Semua kelurahan", label: "Semua kelurahan" },
+                    ...kelurahanOptions.map((k) => ({ value: k.kelurahan, label: k.kelurahan })),
+                  ]}
+                  onChange={setFilterKelurahan}
+                />
+              </div>
 
-              <label>
-                Klasifikasi
-                <select
+              <div className="filter-field">
+                <span>Klasifikasi</span>
+                <SelectAnimasi
+                  label="Klasifikasi"
                   value={filterKelas}
-                  onChange={(e) => setFilterKelas(e.target.value)}
-                >
-                  <option>Semua klasifikasi</option>
-                  {classes.map((c) => (
-                    <option key={c.label} value={c.label}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  options={[
+                    { value: "Semua klasifikasi", label: "Semua klasifikasi" },
+                    ...classes.map((c) => ({ value: c.label, label: c.label })),
+                  ]}
+                  onChange={setFilterKelas}
+                />
+              </div>
 
               <button
                 type="button"
@@ -510,7 +538,7 @@ export default function MapPage() {
             </div>
           </div>
 
-          <ScoreLegend title={currentTheme.label} />
+          <LegendaPeta judulIndeks={currentTheme.label} />
           <div className="map-hint">
             {viewMode === "3d"
               ? "Geser untuk memutar 3D · Scroll untuk zoom · Klik balok kelurahan untuk detail"

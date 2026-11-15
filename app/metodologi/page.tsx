@@ -12,7 +12,7 @@ export default function MethodPage() {
           Rumus yang dapat ditelusuri.
         </h1>
         <p>
-          Indeks Ruang Bogor menggabungkan sepuluh indikator spasial dan
+          Indeks Ruang Bogor menggabungkan dua belas indikator spasial dan
           atribut menjadi enam dimensi kelayakhunian dengan tahapan perhitungan
           yang transparan.
         </p>

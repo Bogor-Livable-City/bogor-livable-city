@@ -67,7 +67,7 @@ export default function Home() {
               <h2>Enam dimensi penyusun kelayakhunian.</h2>
             </div>
             <p className="section-lead">
-              Setiap kelurahan dinilai dari sepuluh indikator spasial dan
+              Setiap kelurahan dinilai dari dua belas indikator spasial dan
               atribut yang dikelompokkan ke dalam enam dimensi utama dengan
               rentang skor ternormalisasi 0,00 sampai 1,00.
             </p>
