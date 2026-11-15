@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Skill antislop dari pihak ketiga (github.com/miqdadbadjuber/anti-slop),
+# dipasang per-mesin, tidak perlu ikut repo.
+.claude/skills/
