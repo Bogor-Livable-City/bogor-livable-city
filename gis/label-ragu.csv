@@ -1,0 +1,12 @@
+﻿layer,nama,label_lama,label_menurut_koordinat,kualitas,jarak_batas_m,catatan
+faskes,Klinik Cibuluh,CIBULUH,Ciparigi,baik,0.6,koordinat baik tapi jatuh di luar semua batas
+faskes,Klinik Citra Pomad,CIBULUH,Ciparigi,baik,0.6,koordinat baik tapi jatuh di luar semua batas
+faskes,SATKES BRIMOB,CIBULUH,Ciparigi,baik,0.6,koordinat baik tapi jatuh di luar semua batas
+faskes,Dr Rudi,TANAH BARU,Ciluar,baik,1.4,koordinat baik tapi menempel garis batas
+faskes,Klinik Pratama Prima (Dokter 24 Jam),EMPANG,Bondongan,baik,1.6,koordinat baik tapi menempel garis batas
+faskes,Siloam Clinic Bogor Selatan,EMPANG,Bondongan,baik,3.9,koordinat baik tapi menempel garis batas
+faskes,DAMESSA FAMILY DENTAL CARE,TEGAL GUNDIL,Bantarjati,baik,6.0,koordinat baik tapi menempel garis batas
+faskes,Puskesmas Pulo Armyn,TAJUR,Sukasari,baik,8.1,koordinat baik tapi menempel garis batas
+sekolah,SMP DARMA BAKTI,HARJASARI,Bojongkerta,baik,5.5,koordinat baik tapi menempel garis batas
+sekolah,SMP IT INSANTAMA,GUNUNG BATU,Loji,baik,5.8,koordinat baik tapi menempel garis batas
+sekolah,SDIT AL HIKMAH,SEMPLAK,Curug,baik,57.7,koordinat baik tapi jatuh di luar semua batas

@@ -1,0 +1,70 @@
+layer,nama,jenis,npsn,asal,aksi,kel_lama,kec_lama,lon_lama,lat_lama,kel_final,kec_final,lon_baru,lat_baru,kel_poligon,kec_poligon,poligon_cocok,nama_google
+faskes,Pelita Sehat,klinik,,meragukan,ganti,TANAH BARU,Bogor Utara,106.815564,-6.581878,Tanah Baru,Bogor Utara,106.8226383,-6.5630929,Tanah Baru,Bogor Utara,ya,Pelita Sehat Clinic
+sekolah,SD AMAL KASIH,sd,20238467,meragukan,ganti,KATULAMPA,Bogor Timur,106.830483,-6.597525,Katulampa,Bogor Timur,106.8305761,-6.5974636,Katulampa,Bogor Timur,ya,Amal Kasih Elementary School
+sekolah,SD IT ZAID BIN TSABIT,sd,60726273,meragukan,ganti,CURUG,Bogor Barat,106.7702,-6.5282,Curug,Bogor Barat,106.7677312,-6.5452407,Curug,Bogor Barat,ya,SDIT ZAID BIN TSABIT
+sekolah,SD KREATIVA,sd,20269437,meragukan,ganti,SUKARESMI,Tanah Sareal,106.7828,-6.566,Sukaresmi,Tanah Sareal,106.7953005,-6.5545917,Sukaresmi,Tanah Sareal,ya,SD Kreativa
+sekolah,SD Kinderfield Bogor,sd,70005423,meragukan,ganti,BATUTULIS,Bogor Selatan,106.843034,-6.671294,Batutulis,Bogor Selatan,106.8113174,-6.6229901,Batutulis,Bogor Selatan,ya,Kinderfield-Highfield School Bogor
+sekolah,SD N KEDUNG BADAK 2,sd,20220021,meragukan,ganti,KEDUNG BADAK,Tanah Sareal,106.8069,-6.55,Kedung Badak,Tanah Sareal,106.8066555,-6.5644129,Kedung Badak,Tanah Sareal,ya,SDN KEDUNG BADAK 2
+sekolah,SD NEGERI CIMAHPAR 4,sd,20220028,meragukan,ganti,CIMAHPAR,Bogor Utara,106.8247,-6.5661,Cimahpar,Bogor Utara,106.8246844,-6.5661387,Cimahpar,Bogor Utara,ya,SDN CIMAHPAR 4
+sekolah,SD NEGERI KAMPUNG SAWAH,sd,20220494,meragukan,ganti,TANAH BARU,Bogor Utara,106.82,-6.5993,Tanah Baru,Bogor Utara,106.820084,-6.5992923,Tanah Baru,Bogor Utara,ya,Sdn Kp. Sawah
+sekolah,SD SENTANA MONTESORI SCHOOL,sd,69889181,meragukan,ganti,TANAH SAREAL,Tanah Sareal,106.7999,-6.5555,Tanah Sareal,Tanah Sareal,106.8023979,-6.5710488,Tanah Sareal,Tanah Sareal,ya,Sentana Montessori School
+sekolah,SDIT SHOLAHUDDIN,sd,69995756,meragukan,ganti,PASIR KUDA,Bogor Barat,106.794044,-6.617216,Pasir Kuda,Bogor Barat,106.7801159,-6.6020168,Pasir Kuda,Bogor Barat,ya,SDIT Sholahuddin
+sekolah,SDS BINA TUNAS CEMERLANG,sd,20270429,meragukan,ganti,KEBON PEDES,Tanah Sareal,106.7829,-6.5605,Kebon Pedes,Tanah Sareal,106.7945696,-6.5812961,Kebon Pedes,Tanah Sareal,ya,School Bina Tunas Cemerlang
+sekolah,SMAS MUHAMMADIYAH,sma_smk,20220314,meragukan,ganti,EMPANG,Bogor Selatan,106.7883,-6.5881,Empang,Bogor Selatan,106.7976126,-6.6109301,Empang,Bogor Selatan,ya,SMP Muhammadiyah Kota Bogor
+sekolah,SMK ALQI PROFESI BOGOR,sma_smk,69901351,meragukan,ganti,CIPARIGI,Bogor Utara,106.8108,-6.5911,Ciparigi,Bogor Utara,106.8185376,-6.5504064,Ciparigi,Bogor Utara,ya,SMK ALQI Profesi Bogor
+sekolah,SMK MODERN AL - ALAWIYAH BOGOR,sma_smk,69950954,meragukan,ganti,KENCANA,Tanah Sareal,106.777742,-6.526854,Kencana,Tanah Sareal,106.7867274,-6.5284481,Kencana,Tanah Sareal,ya,Ponpes Modern Al - Alawiyah
+sekolah,SMK NUSANTARA KOTA BOGOR,sma_smk,69886244,meragukan,ganti,CILUAR,Bogor Utara,106.816691,-6.58378,Ciluar,Bogor Utara,106.8267749,-6.5538558,Ciluar,Bogor Utara,ya,SMK Nusantara Kota Bogor
+sekolah,SMK PLUS DAWATUL QURAN BOGOR,sma_smk,69932818,meragukan,ganti,GUNUNG BATU,Bogor Barat,106.763799,-6.56414,Gunung Batu,Bogor Barat,106.7794529,-6.5908039,Gunung Batu,Bogor Barat,ya,SMP - SMK PLUS DA'WATUL QUR'AN
+sekolah,SMK TAMANSISWA BOGOR,sma_smk,69947461,meragukan,ganti,CIWARINGIN,Bogor Tengah,106.809113,-6.591685,Ciwaringin,Bogor Tengah,106.7881347,-6.5830732,Ciwaringin,Bogor Tengah,ya,PERGURUAN TAMANSISWA CABANG BOGOR
+sekolah,SMKS INFOKOM BOGOR,sma_smk,20238531,meragukan,ganti,SINDANG BARANG,Bogor Barat,106.7793,-6.5973,Sindang Barang,Bogor Barat,106.767227,-6.5806046,Sindang Barang,Bogor Barat,ya,SMK Infokom Kota Bogor
+sekolah,SMKS TUNAS BANGSA SEJAHTERA,sma_smk,20271922,meragukan,ganti,BUBULAK,Bogor Barat,106.7419,-6.5516,Bubulak,Bogor Barat,106.7495937,-6.563257,Bubulak,Bogor Barat,ya,School SMK Tunas Bangsa Sejahtera
+sekolah,SMP AMAL KASIH,smp,20269193,meragukan,ganti,KATULAMPA,Bogor Timur,106.830608,-6.597525,Katulampa,Bogor Timur,106.8305761,-6.5974636,Katulampa,Bogor Timur,ya,Amal Kasih Elementary School
+sekolah,SMP ISLAM DA WATUL QURAN,smp,60726275,meragukan,ganti,GUNUNG BATU,Bogor Barat,106.7796,-6.5792,Gunung Batu,Bogor Barat,106.7794529,-6.5908039,Gunung Batu,Bogor Barat,ya,SMP - SMK PLUS DA'WATUL QUR'AN
+sekolah,SMP KREATIVA,smp,69987584,meragukan,ganti,KAYU MANIS,Tanah Sareal,106.790029,-6.528804,Kayu Manis,Tanah Sareal,106.7668203,-6.5243639,Kayu Manis,Tanah Sareal,ya,SMP Kreativa Bogor
+sekolah,SMP MODERN AL- ALAWIYAH,smp,69942577,meragukan,ganti,KENCANA,Tanah Sareal,106.78956,-6.564579,Kencana,Tanah Sareal,106.7865572,-6.5284048,Kencana,Tanah Sareal,ya,SMP Modern Al Alawiyah
+sekolah,SMP MUTIARA KARTINI,smp,20268774,meragukan,ganti,CIWARINGIN,Bogor Tengah,106.8097,-6.5865,Ciwaringin,Bogor Tengah,106.7905445,-6.5758692,Ciwaringin,Bogor Tengah,ya,SMP Mutiara Kartini
+sekolah,SMP PANDUTAMA,smp,20271353,meragukan,ganti,BANTARJATI,Bogor Utara,106.8184,-6.5789,Bantarjati,Bogor Utara,106.808643,-6.5708311,Bantarjati,Bogor Utara,ya,Smp Pandutama
+sekolah,SMP TARUNA BANGSA,smp,20244215,meragukan,ganti,PASIR KUDA,Bogor Barat,106.775,-6.5984,Pasir Kuda,Bogor Barat,106.7853,-6.6030295,Pasir Kuda,Bogor Barat,ya,Smp Taruna Bangsa
+sekolah,SMP WINDIAN NUGRAHA,smp,20238513,meragukan,ganti,CILENDEK BARAT,Bogor Barat,106.772,-6.5502,Cilendek Barat,Bogor Barat,106.7686781,-6.5700931,Cilendek Barat,Bogor Barat,ya,SMK Windian Nugraha
+faskes,Klinik Gigiku Sehat,klinik,,meragukan,ganti,BANTARJATI,Bogor Utara,106.818309,-6.577594,Tegal Gundil,Bogor Utara,106.818228,-6.5774077,Tegal Gundil,Bogor Utara,ya,Klinik Gigiku Sehat Bogor
+sekolah,SD CAUSA PRIMA,sd,70023491,meragukan,ganti,CILENDEK BARAT,Bogor Barat,106.7775,-6.5711,Cilendek Timur,Bogor Barat,106.7774599,-6.571049,Cilendek Timur,Bogor Barat,ya,TK & SD Sekolah Causa Prima Bogor
+sekolah,SMK PUTRA HARAPAN BOGOR,sma_smk,69830391,meragukan,ganti,PAMOYANAN,Bogor Selatan,106.797441,-6.649745,Sindang Barang,Bogor Barat,106.757251,-6.5736177,Sindang Barang,Bogor Barat,ya,"SMK Putra harapan, Bogor"
+sekolah,SMKS BUDI DARMA,sma_smk,60726274,meragukan,ganti,KEDUNG WARINGIN,Tanah Sareal,106.8185,-6.5893,Tanah Baru,Bogor Utara,106.8184679,-6.5892726,Tanah Baru,Bogor Utara,ya,SMK BUDI DARMA
+sekolah,SMKS PGRI 4 KOTA BOGOR,sma_smk,20256262,meragukan,ganti,BARANANGSIANG,Bogor Timur,106.8327,-6.5879,Cimahpar,Bogor Utara,106.8326197,-6.5878867,Cimahpar,Bogor Utara,ya,SMK PGRI 4 BOGOR
+sekolah,SMKS YZA 3 BOGOR,sma_smk,20220296,meragukan,ganti,KEBON KALAPA,Bogor Tengah,106.8455,-6.6517,Menteng,Bogor Barat,106.7837793,-6.5875906,Kebon Kalapa,Bogor Tengah,tidak,Sekolah Menengah Kejuruan YZA 3 Bogor
+sekolah,SMP YASIH,smp,20220358,meragukan,ganti,BARANANGSIANG,Bogor Timur,106.829777,-6.613315,Katulampa,Bogor Timur,106.8298061,-6.6131591,Katulampa,Bogor Timur,ya,SMA Yasih
+sekolah,SMKS TARUNA BANGSA 1 BOGOR,sma_smk,20220302,meragukan,hapus,PASIR KUDA,Bogor Barat,106.7732,-6.598,Pasir Kuda,,,,,,,
+sekolah,SMKS TARUNA BANGSA 2 BOGOR,sma_smk,20220303,meragukan,hapus,PASIR KUDA,Bogor Barat,106.775,-6.5984,Pasir Kuda,,,,,,,
+sekolah,SMP PGRI 14,smp,20220420,meragukan,hapus,MARGAJAYA,Bogor Barat,106.7461,-6.5598,Margajaya,,,,,,,
+faskes,Cera Dental Care,klinik,,fallback,ganti,BANTARJATI,Bogor Utara,106.807323,-6.575495,Bantarjati,Bogor Utara,106.8087025,-6.5813043,Bantarjati,Bogor Utara,ya,Cera Dental Care
+faskes,Fbc Estetika & Laser Center,klinik,,fallback,ganti,TEGAL GUNDIL,Bogor Utara,106.815316,-6.579918,Tegal Gundil,Bogor Utara,106.8136537,-6.5814102,Tegal Gundil,Bogor Utara,ya,FBC Estetika & Laser Center Bogor
+faskes,KLINIK BIDAN JUANG,klinik,,fallback,ganti,BOJONGKERTA,Bogor Selatan,106.838667,-6.669271,Bojongkerta,Bogor Selatan,106.8394721,-6.6690352,Bojongkerta,Bogor Selatan,ya,"Praktek Mandiri Bidan R Juang Putri S, S.Tr.Keb., Bdn"
+faskes,KLINIK NURHAYATI,klinik,,fallback,ganti,BATUTULIS,Bogor Selatan,106.807871,-6.621947,Batutulis,Bogor Selatan,106.8100037,-6.6270462,Batutulis,Bogor Selatan,ya,Klinik Nurhayati
+faskes,KLINIK TJANG DEN TAL,klinik,,fallback,ganti,BATUTULIS,Bogor Selatan,106.807871,-6.621947,Batutulis,Bogor Selatan,106.8133147,-6.6192908,Batutulis,Bogor Selatan,ya,Tjang Dental Care | Dokter Gigi Umum & Spesialis
+faskes,KLINIK UTAMA MATA PURNAMA,klinik,,fallback,ganti,CIBADAK,Tanah Sareal,106.776886,-6.546441,Cibadak,Tanah Sareal,106.7821157,-6.5543105,Cibadak,Tanah Sareal,ya,Klinik Utama Mata Purnama
+faskes,Klinik Medika,klinik,,fallback,ganti,BANTARJATI,Bogor Utara,106.807323,-6.575495,Bantarjati,Bogor Utara,106.8082744,-6.5809525,Bantarjati,Bogor Utara,ya,Dokter 24 Jam Klinik Medika Bangbarung
+faskes,Klinik Medikids By MHDC Bogor,klinik,,fallback,ganti,CIBADAK,Tanah Sareal,106.776886,-6.546441,Cibadak,Tanah Sareal,106.7824395,-6.5566728,Cibadak,Tanah Sareal,ya,Klinik Gigi & Vaksin Medikids Bogor
+faskes,Klinik Utama Beyoutiful by dr Tompi Bogor,klinik,,fallback,ganti,TEGAL GUNDIL,Bogor Utara,106.815316,-6.579918,Tegal Gundil,Bogor Utara,106.8139095,-6.5816629,Tegal Gundil,Bogor Utara,ya,Beyoutiful By Dr Tompi Bogor
+faskes,Klinik Utama Bidakara Medical center,klinik,,fallback,ganti,BANTARJATI,Bogor Utara,106.807323,-6.575495,Bantarjati,Bogor Utara,106.809475,-6.5812848,Bantarjati,Bogor Utara,ya,Klinik Utama Bidakara Medical Center Bogor
+faskes,Klinik Utama Cikal Mulia Bogor,klinik,,fallback,ganti,TEGAL GUNDIL,Bogor Utara,106.815316,-6.579918,Tegal Gundil,Bogor Utara,106.8174937,-6.574656,Tegal Gundil,Bogor Utara,ya,KLINIK CIKAL MULIA CABANG BOGOR (Klinik Bersalin 24 Jam)
+faskes,Klinik Utama Cura Medika Indonesia,klinik,,fallback,ganti,BARANANGSIANG,Bogor Timur,106.814221,-6.609971,Baranangsiang,Bogor Timur,106.808519,-6.6057572,Baranangsiang,Bogor Timur,ya,"CURA MEDIKA (KLINIK FISIOTERAPI, REHAB MEDIK, SPORT MEDICINE)"
+faskes,Klinik Utama M3,klinik,,fallback,ganti,TEGALLEGA,Bogor Tengah,106.810895,-6.597935,Tegallega,Bogor Tengah,106.8072727,-6.6027546,Tegallega,Bogor Tengah,ya,Klinik Utama M3
+faskes,Klinik Utama No Rawat Inap Prodia,klinik,,fallback,ganti,SEMPUR,Bogor Tengah,106.798406,-6.586223,Sempur,Bogor Tengah,106.7971169,-6.5841989,Sempur,Bogor Tengah,ya,Prodia Bogor - Sudirman
+faskes,Klinik Utama Satu Dental By Drg Indah Ekasari Sp Ort,klinik,,fallback,ganti,BARANANGSIANG,Bogor Timur,106.814221,-6.609971,Baranangsiang,Bogor Timur,106.814314,-6.616388,Baranangsiang,Bogor Timur,ya,Satu Dental Bogor Pajajaran
+faskes,Klinik Utama ZAP Bogor,klinik,,fallback,ganti,TEGAL GUNDIL,Bogor Utara,106.815316,-6.579918,Tegal Gundil,Bogor Utara,106.8122395,-6.5813101,Tegal Gundil,Bogor Utara,ya,ZAP Clinic- Bogor
+faskes,New LNA Skin Health Clinic,klinik,,fallback,ganti,BANTARJATI,Bogor Utara,106.807323,-6.575495,Bantarjati,Bogor Utara,106.808745,-6.5814978,Bantarjati,Bogor Utara,ya,New LNA Skin Health Clinic
+faskes,Pelita Sehat Pomad,klinik,,fallback,ganti,CIBULUH,Bogor Utara,106.818281,-6.558349,Cibuluh,Bogor Utara,106.8235653,-6.5478175,Cibuluh,Bogor Utara,ya,KLINIK PELITA SEHAT POMAD
+faskes,Prodia Health Care Bogor,klinik,,fallback,ganti,BARANANGSIANG,Bogor Timur,106.814221,-6.609971,Baranangsiang,Bogor Timur,106.8145702,-6.6154627,Baranangsiang,Bogor Timur,ya,Prodia Bogor - Pajajaran
+faskes,RS Ibu dan Anak Sawojajar,rs,,fallback,ganti,PABATON,Bogor Tengah,106.794514,-6.588899,Pabaton,Bogor Tengah,106.793518,-6.588467,Pabaton,Bogor Tengah,ya,RSKIA Sawojajar
+sekolah,SDIT BINA INSAN MANDIRI,sd,70058356,fallback,ganti,CILENDEK BARAT,Bogor Barat,106.766988,-6.570007,Cilendek Barat,Bogor Barat,106.7687444,-6.5663492,Cilendek Barat,Bogor Barat,ya,SDIT Bina Insan Mandiri - Bogor
+sekolah,SMA BINA INSAN MANDIRI,sma_smk,70029863,fallback,ganti,CILENDEK BARAT,Bogor Barat,106.766988,-6.570007,Cilendek Barat,Bogor Barat,106.7687547,-6.5662186,Cilendek Barat,Bogor Barat,ya,Ponpes Al Ihsan Baron Bogor & SMP - SMA Bina Insan Mandiri Bogor
+sekolah,SMK KESATUAN,sma_smk,70041446,fallback,ganti,BARANANGSIANG,Bogor Timur,106.814221,-6.609971,Baranangsiang,Bogor Timur,106.8118035,-6.6137915,Baranangsiang,Bogor Timur,ya,SEKOLAH KESATUAN BOGOR
+sekolah,SMP Al-Azhar Syifa Budi Kota Bogor - BNR,smp,70059279,fallback,ganti,MULYAHARJA,Bogor Selatan,106.790018,-6.640143,Mulyaharja,Bogor Selatan,106.7918163,-6.6387273,Mulyaharja,Bogor Selatan,ya,Sekolah Al-Azhar Syifa Budi Kota Bogor-BNR
+sekolah,SMP HIGHFIELD,smp,70051932,fallback,ganti,BATUTULIS,Bogor Selatan,106.807871,-6.621947,Batutulis,Bogor Selatan,106.8113174,-6.6229901,Batutulis,Bogor Selatan,ya,Kinderfield-Highfield School Bogor
+sekolah,Sekolah Dasar Nizhamia Indonesia,sd,70061156,fallback,ganti,CURUG MEKAR,Bogor Barat,106.769909,-6.559288,Curug Mekar,Bogor Barat,106.7704612,-6.5586935,Curug Mekar,Bogor Barat,ya,Nizhamia Indigenous Indonesian School
+faskes,UPTD Puskesmas Sindangbarang,puskesmas,,fallback,ganti,SINDANG BARANG,Bogor Barat,106.75837,-6.574978,Sindang Barang,Bogor Barat,106.7622127,-6.5782608,Sindang Barang,Bogor Barat,ya,Puskesmas Sindangbarang
+faskes,KLINIK DR LINDASARI,klinik,,fallback,ganti,BATUTULIS,Bogor Selatan,106.807871,-6.621947,Sukasari,Bogor Timur,106.8153048,-6.6204457,Sukasari,Bogor Timur,ya,dr. Dewi Lindasari
+faskes,Klinik Mata dr Hasri Ainun Habibie,klinik,,fallback,ganti,KEDUNG BADAK,Tanah Sareal,106.798318,-6.563051,Kebon Kelapa,Bogor Tengah,106.7787998,-6.5805304,Menteng,Bogor Barat,tidak,Klinik Mata dr. Hasri Ainun Habibie
+sekolah,SD IT AL MANSYUR,sd,70051394,fallback,ganti,MENTENG,Bogor Barat,106.781395,-6.581794,Sindangsari,Bogor Timur,106.8454713,-6.6511821,Sindangsari,Bogor Timur,ya,YAYASAN ZELANI AL-MANSYUR
+sekolah,SEKOLAH MENENGAH ATAS NEGERI 11 BOGOR,sma_smk,70062861,fallback,pertahankan,KAYU MANIS,Tanah Sareal,106.770782,-6.527083,Kayu Manis,Tanah Sareal,106.770782,-6.527083,Kayu Manis,Tanah Sareal,ya,—
+faskes,Klinik Dokter Gigi,klinik,,fallback,hapus,RANGGAMEKAR,Bogor Selatan,106.802435,-6.624496,Ranggamekar,,,,,,,
