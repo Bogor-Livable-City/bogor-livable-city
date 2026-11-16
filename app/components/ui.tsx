@@ -157,7 +157,6 @@ const nav: [string, string, string][] = [
   ["/dashboard", "Statistik", "chart"],
   ["/peringkat", "Peringkat", "rank"],
   ["/perbandingan", "Bandingkan", "compare"],
-  ["/sensitivitas", "Simulasi", "sliders"],
   ["/asisten", "Tanya Bogor", "bot"],
 ];
 
@@ -277,7 +276,6 @@ export function Footer() {
         <Link href="/peta">Peta 68 kelurahan</Link>
         <Link href="/peringkat">Tabel peringkat wilayah</Link>
         <Link href="/perbandingan">Bandingkan dua wilayah</Link>
-        <Link href="/sensitivitas">Simulasi bobot dimensi</Link>
       </div>
       <div>
         <span>Rujukan &amp; metode</span>

@@ -86,6 +86,11 @@ export default function MapPage() {
   > | null>(null);
   const [geoLoading, setGeoLoading] = useState(true);
   const [geoError, setGeoError] = useState<string | null>(null);
+  // Petunjuk memudar 5 detik setelah kanvas peta benar-benar terbentuk, bukan
+  // setelah geojson tiba: menggambar 68 poligon masih makan belasan detik lagi,
+  // dan petunjuknya jadi hilang sebelum petanya kelihatan.
+  const [petunjuk, setPetunjuk] = useState<"tampil" | "pudar" | "hilang">("tampil");
+  const [petaSiap, setPetaSiap] = useState(false);
   const [selectedKode, setSelectedKode] = useState<string | null>(
     kelurahanData[0]?.kode ?? null
   );
@@ -124,6 +129,21 @@ export default function MapPage() {
   useEffect(() => {
     loadGeoData();
   }, [loadGeoData]);
+
+  // Mode 3D tidak memakai LeafletMap, jadi tidak ada onSiap yang memanggil.
+  useEffect(() => {
+    if (viewMode === "3d" && !geoLoading && geoData) setPetaSiap(true);
+  }, [viewMode, geoLoading, geoData]);
+
+  useEffect(() => {
+    if (!petaSiap) return;
+    const mulaiPudar = setTimeout(() => setPetunjuk("pudar"), 4000);
+    const lepas = setTimeout(() => setPetunjuk("hilang"), 5000);
+    return () => {
+      clearTimeout(mulaiPudar);
+      clearTimeout(lepas);
+    };
+  }, [petaSiap]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -502,6 +522,7 @@ export default function MapPage() {
               selectedKode={selectedKode}
               visibleKodes={visibleKodes}
               onSelect={setSelectedKode}
+              onSiap={() => setPetaSiap(true)}
             />
           )}
 
@@ -539,11 +560,13 @@ export default function MapPage() {
           </div>
 
           <LegendaPeta judulIndeks={currentTheme.label} />
-          <div className="map-hint">
-            {viewMode === "3d"
-              ? "Geser untuk memutar 3D · Scroll untuk zoom · Klik balok kelurahan untuk detail"
-              : "Klik poligon atau nama kelurahan pada peta untuk melihat detail"}
-          </div>
+          {petunjuk !== "hilang" && (
+            <div className={petunjuk === "pudar" ? "map-hint pudar" : "map-hint"}>
+              {viewMode === "3d"
+                ? "Geser untuk memutar 3D · Scroll untuk zoom · Klik balok kelurahan untuk detail"
+                : "Klik poligon atau nama kelurahan pada peta untuk melihat detail"}
+            </div>
+          )}
         </section>
 
         {selectedPlace && (

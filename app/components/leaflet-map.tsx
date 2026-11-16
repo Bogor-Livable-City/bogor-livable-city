@@ -31,6 +31,7 @@ type Props = {
   selectedKode: string | null;
   visibleKodes: Set<string> | null; // null = semua tampil
   onSelect: (kode: string | null) => void;
+  onSiap?: () => void; // dipanggil sekali setelah kanvas peta benar-benar terbentuk
 };
 
 const BASEMAPS: Record<
@@ -122,6 +123,7 @@ export default function LeafletMap({
   selectedKode,
   visibleKodes,
   onSelect,
+  onSiap,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -131,8 +133,8 @@ export default function LeafletMap({
   const overlayRefs = useRef<Partial<Record<OverlayKey, L.Layer>>>({});
   const overlayLoading = useRef<Partial<Record<OverlayKey, Promise<L.Layer>>>>({});
 
-  const state = useRef({ theme, fillOpacity, selectedKode, visibleKodes, onSelect });
-  state.current = { theme, fillOpacity, selectedKode, visibleKodes, onSelect };
+  const state = useRef({ theme, fillOpacity, selectedKode, visibleKodes, onSelect, onSiap });
+  state.current = { theme, fillOpacity, selectedKode, visibleKodes, onSelect, onSiap };
 
   const stateOverlays = useRef(overlays);
   stateOverlays.current = overlays;
@@ -197,6 +199,7 @@ export default function LeafletMap({
     map.fitBounds(choropleth.getBounds(), { padding: [20, 20] });
     map.setMaxBounds(choropleth.getBounds().pad(0.6));
     mapRef.current = map;
+    state.current.onSiap?.();
 
     const ro = new ResizeObserver(() => map.invalidateSize());
     ro.observe(containerRef.current);
