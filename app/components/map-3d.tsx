@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FeatureCollection, Geometry, Position } from "geojson";
 import { classify, fmt, type KelurahanProps, type ThemeKey } from "../lib/livability";
+import { usePinchZoom } from "../lib/pinch";
 
 type Props = {
   data: FeatureCollection<Geometry, KelurahanProps>;
@@ -60,11 +61,6 @@ function shadeHex(hex: string, factor: number): string {
   return `rgb(${r},${g},${b})`;
 }
 
-// ArrayLike dipakai supaya cocok dengan TouchList versi React maupun DOM.
-function jarakDuaJari(t: ArrayLike<{ clientX: number; clientY: number }>): number {
-  return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-}
-
 function pointInRing(px: number, py: number, ring: [number, number][]): boolean {
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -85,6 +81,7 @@ export default function Map3D({
   onSelect,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const [yaw, setYaw] = useState(-0.42);
   const [pitch, setPitch] = useState(0.92);
   const [zoom, setZoom] = useState(1.08);
@@ -97,9 +94,6 @@ export default function Map3D({
     y: 0,
     moved: false,
   });
-
-  // Jarak dua jari saat cubitan dimulai, dipakai sebagai acuan rasio zoom.
-  const cubitRef = useRef<{ jarak: number; zoom: number } | null>(null);
 
   // Hit-test cache untuk klik & hover pada poligon atap 3D
   const hitPolysRef = useRef<{ kode: string; poly: [number, number][] }[]>([]);
@@ -354,8 +348,14 @@ export default function Map3D({
     return null;
   };
 
+  usePinchZoom(
+    wrapRef,
+    (rasio, awal) => setZoom(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, awal * rasio))),
+    () => zoom
+  );
+
   return (
-    <div className="map-3d-wrap">
+    <div className="map-3d-wrap" ref={wrapRef}>
       <canvas
         ref={canvasRef}
         className="leaflet-host"
@@ -391,26 +391,17 @@ export default function Map3D({
           e.preventDefault();
           setZoom((z) => Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z * (e.deltaY < 0 ? 1.08 : 0.92))));
         }}
-        // touch-action none supaya cubitan tidak diambil alih zoom bawaan browser.
+        // Satu jari memutar, jadi tidak ada gestur halaman yang perlu lewat.
         style={{ touchAction: "none" }}
         onTouchStart={(e) => {
-          if (e.touches.length === 2) {
-            cubitRef.current = { jarak: jarakDuaJari(e.touches), zoom };
+          if (e.touches.length !== 1) {
             dragRef.current.active = false;
             return;
           }
-          cubitRef.current = null;
           const t = e.touches[0];
           dragRef.current = { active: true, x: t.clientX, y: t.clientY, moved: false };
         }}
         onTouchMove={(e) => {
-          if (e.touches.length === 2 && cubitRef.current) {
-            const rasio = jarakDuaJari(e.touches) / cubitRef.current.jarak;
-            setZoom(
-              Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, cubitRef.current.zoom * rasio))
-            );
-            return;
-          }
           if (e.touches.length !== 1 || !dragRef.current.active) return;
           const t = e.touches[0];
           const dx = t.clientX - dragRef.current.x;
@@ -424,10 +415,8 @@ export default function Map3D({
         onTouchEnd={(e) => {
           if (e.touches.length > 0) return;
           const wasMoved = dragRef.current.moved;
-          const cubitTadi = cubitRef.current !== null;
           dragRef.current.active = false;
-          cubitRef.current = null;
-          if (wasMoved || cubitTadi || e.changedTouches.length !== 1) return;
+          if (wasMoved || e.changedTouches.length !== 1) return;
           const t = e.changedTouches[0];
           const hit = findHitKode(t.clientX, t.clientY);
           if (hit) onSelect(hit);

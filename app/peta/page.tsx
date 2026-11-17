@@ -584,7 +584,7 @@ export default function MapPage() {
                   onClick={() => setSelectedKode(null)}
                   aria-label="Tutup panel detail kelurahan"
                 >
-                  ×
+                  <Icon name="close" size={15} />
                 </button>
                 <b>#{selectedPlace.peringkat}</b>
               </div>

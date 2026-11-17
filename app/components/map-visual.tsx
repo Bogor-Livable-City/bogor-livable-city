@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { bogorSvgPaths } from "../lib/bogor-svg-paths";
 import { kelurahanData } from "../kelurahan-data";
 import { classes, scoreToColor, toSlug } from "../lib/livability";
+import { usePinchZoom } from "../lib/pinch";
 
 
 const kelurahanBySlug = new Map(
@@ -66,10 +67,6 @@ const pusatKecamatan = Object.entries(
   )
 ).map(([nama, a]) => ({ nama, x: a.x / a.n, y: a.y / a.n }));
 
-// ArrayLike dipakai supaya cocok dengan TouchList versi React maupun DOM.
-function jarakDuaJari(t: ArrayLike<{ clientX: number; clientY: number }>): number {
-  return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-}
 
 export function BogorMap({
   compact = false,
@@ -88,7 +85,13 @@ export function BogorMap({
 }) {
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
   const [scale, setScale] = useState(ZOOM_MIN);
-  const cubitRef = useRef<{ jarak: number; scale: number } | null>(null);
+  const wadahRef = useRef<HTMLDivElement>(null);
+
+  usePinchZoom(
+    wadahRef,
+    (rasio, awal) => setScale(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, awal * rasio))),
+    () => scale
+  );
 
   const activeSlug = hoveredSlug ?? (selected ? selectedSlug : null);
   const activeItem = activeSlug
@@ -101,22 +104,9 @@ export function BogorMap({
   return (
     <div
       className={`map-canvas ${compact ? "map-compact" : ""}`}
-      // touch-action none supaya cubitan dibaca di sini, bukan oleh browser.
-      style={{ touchAction: "none" }}
-      onTouchStart={(e) => {
-        if (e.touches.length !== 2) return;
-        cubitRef.current = { jarak: jarakDuaJari(e.touches), scale };
-      }}
-      onTouchMove={(e) => {
-        if (e.touches.length !== 2 || !cubitRef.current) return;
-        const rasio = jarakDuaJari(e.touches) / cubitRef.current.jarak;
-        setScale(
-          Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, cubitRef.current.scale * rasio))
-        );
-      }}
-      onTouchEnd={(e) => {
-        if (e.touches.length === 0) cubitRef.current = null;
-      }}
+      ref={wadahRef}
+      // pan-y supaya halaman tetap bisa digulir dengan satu jari di atas peta.
+      style={{ touchAction: "pan-y" }}
     >
       <div className="map-paper" aria-hidden="true" />
       <svg
@@ -264,9 +254,27 @@ export function BogorMap({
 
 export function ScoreLegend({
   title = "Indeks kelayakhunian",
+  ringkas = false,
 }: {
   title?: string;
+  ringkas?: boolean;
 }) {
+  // Versi ringkas: judul, bar, dan nama kelas di kedua ujungnya saja.
+  if (ringkas) {
+    return (
+      <div className="legend-isi">
+        <div className="legend-title">
+          <span>{title}</span>
+        </div>
+        <div className="legend-bar" />
+        <div className="legend-ujung">
+          <span>{classes[classes.length - 1].label}</span>
+          <span>{classes[0].label}</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="legend-isi">
       <div className="legend-title">

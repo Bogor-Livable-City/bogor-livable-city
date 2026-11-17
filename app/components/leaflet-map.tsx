@@ -28,6 +28,24 @@ function jalurSvg(l: L.Path): SVGPathElement | undefined {
   return (l as L.Path & { _path?: SVGPathElement })._path;
 }
 
+// resetStyle hanya menimpa properti yang disebut gaya dasarnya, jadi dashArray
+// dari hover harus dihapus sendiri kalau tidak mau ikut menempel di poligon
+// yang sedang dipilih.
+function bersihkanHover(l: L.Path) {
+  jalurSvg(l)?.classList.remove("batas-hover");
+  l.setStyle({ dashArray: undefined });
+}
+
+// Poligon terpilih harus kembali paling depan setelah tetangganya diangkat
+// oleh hover, kalau tidak batasnya tertimpa lagi.
+function angkatTerpilih(layer: L.GeoJSON<KelurahanProps>, kode: string | null) {
+  if (!kode) return;
+  layer.eachLayer((l) => {
+    const gl = l as L.Polygon & { feature?: Feature<Geometry, KelurahanProps> };
+    if (gl.feature?.properties.kode === kode) gl.bringToFront();
+  });
+}
+
 type Props = {
   data: FeatureCollection<Geometry, KelurahanProps>;
   theme: ThemeKey;
@@ -200,8 +218,9 @@ export default function LeafletMap({
           },
           mouseout: (e) => {
             const l = e.target as L.Path;
-            jalurSvg(l)?.classList.remove("batas-hover");
+            bersihkanHover(l);
             choropleth.resetStyle(l);
+            angkatTerpilih(choropleth, state.current.selectedKode);
           },
           click: () => state.current.onSelect(p.kode),
         });
@@ -259,7 +278,11 @@ export default function LeafletMap({
   useEffect(() => {
     const layer = choroplethRef.current;
     if (!layer) return;
-    layer.eachLayer((l) => layer.resetStyle(l as L.Path));
+    layer.eachLayer((l) => {
+      const p = l as L.Path;
+      layer.resetStyle(p);
+      bersihkanHover(p);
+    });
     if (selectedKode) {
       layer.eachLayer((l) => {
         const gl = l as L.Polygon & { feature?: Feature<Geometry, KelurahanProps> };
