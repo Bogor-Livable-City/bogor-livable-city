@@ -211,6 +211,12 @@ export default function MapPage() {
   const toggleOverlay = (key: OverlayKey) =>
     setOverlays((prev) => ({ ...prev, [key]: !prev[key] }));
 
+  const setGrupAktif = (keys: OverlayKey[], nilai: boolean) =>
+    setOverlays((prev) => ({
+      ...prev,
+      ...Object.fromEntries(keys.map((k) => [k, nilai])),
+    }));
+
   const switchBasemap = (next: Basemap) => {
     setBasemap(next);
     if (next === "satellite" && fillOpacity > 0.65) {
@@ -353,13 +359,28 @@ export default function MapPage() {
                   </label>
                 ));
                 if (!grup.judul) return baris;
+                const kunci = grup.items.map((i) => i.key);
+                const semuaAktif = kunci.every((k) => overlays[k]);
                 return (
-                  <details className="layer-group" key={grup.judul}>
-                    <summary>
-                      <span>{grup.judul}</span>
-                    </summary>
-                    {baris}
-                  </details>
+                  <div className="layer-group-wrap" key={grup.judul}>
+                    <details className="layer-group">
+                      <summary>
+                        <span>{grup.judul}</span>
+                      </summary>
+                      {baris}
+                    </details>
+                    {/* Di luar <details> supaya tetap tampil saat tertutup, dan
+                        di luar <summary> supaya kliknya tidak membuka dropdown. */}
+                    <label className="toggle-row group-toggle">
+                      <input
+                        type="checkbox"
+                        aria-label={`Tampilkan semua ${grup.judul}`}
+                        checked={semuaAktif}
+                        onChange={() => setGrupAktif(kunci, !semuaAktif)}
+                      />
+                      <b />
+                    </label>
+                  </div>
                 );
               })}
 
@@ -403,19 +424,6 @@ export default function MapPage() {
                 >
                   <span className="base-osm" />
                   Jalan (OSM)
-                </button>
-                <button
-                  type="button"
-                  className={
-                    basemap === "topo" && viewMode === "2d" ? "active" : ""
-                  }
-                  onClick={() => {
-                    setViewMode("2d");
-                    switchBasemap("topo");
-                  }}
-                >
-                  <span className="base-topo" />
-                  Topografi
                 </button>
               </div>
             </div>

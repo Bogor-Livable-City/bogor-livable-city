@@ -1676,3 +1676,60 @@ html[data-splash="done"] .rb-site-stage {
 .city-map-panel .legend-bar {
   width: 100%;
 }
+
+/* Tiga pilihan basemap muat satu baris setelah topografi dihapus. */
+.basemap-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+.basemap-grid button {
+  text-align: center;
+}
+
+/* Label dimensi yang membungkus dua baris: rapatkan barisnya supaya jarak
+   antar baris tidak lebih besar daripada jarak antar dimensi. */
+.mini-dimensions > div {
+  height: auto;
+  min-height: 25px;
+  padding: 4px 0;
+}
+.mini-dimensions > div > span {
+  line-height: 1.15;
+}
+
+/* Toggle induk tiap grup layer. Ditaruh di luar <summary> supaya menekannya
+   tidak ikut membuka atau menutup dropdown-nya. */
+.layer-group-wrap {
+  position: relative;
+}
+.group-toggle {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  height: 45px;
+  border-bottom: 0;
+  justify-content: flex-end;
+}
+
+/* Kolom tabel indikator: Dimensi, Indikator, Nilai, Arah. */
+.indicator-section .data-table .table-head,
+.indicator-section .data-table .table-row {
+  grid-template-columns: 1.1fr 2fr 1.7fr 0.6fr;
+  gap: 10px;
+}
+
+/* Tinggi header dipakai ulang oleh beberapa layout. Setelah navbar
+   dirampingkan, nilai 74px yang tertanam di stylesheet lain menyisakan strip
+   kosong di bawah peta, jadi semuanya diikat ke satu variabel. */
+:root {
+  --tinggi-header: 58px;
+}
+.site-header {
+  height: var(--tinggi-header);
+}
+.map-workspace,
+.assistant-page > main {
+  height: calc(100dvh - var(--tinggi-header));
+}
+.assistant-page > main {
+  min-height: calc(100dvh - var(--tinggi-header));
+}

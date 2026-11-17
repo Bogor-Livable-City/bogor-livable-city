@@ -20,7 +20,7 @@ export type OverlayKey =
   | "smp"
   | "sma_smk"
   | "jalan";
-export type Basemap = "light" | "satellite" | "osm" | "topo";
+export type Basemap = "light" | "satellite" | "osm";
 
 // Leaflet tidak menyediakan jalan resmi ke elemen SVG-nya, padahal animasi
 // garis putus-putus saat hover hanya bisa dipasang lewat kelas CSS di situ.
@@ -82,12 +82,6 @@ const BASEMAPS: Record<
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
-  },
-  topo: {
-    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-    attribution:
-      'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, SRTM | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
-    maxZoom: 17,
   },
 };
 
@@ -166,7 +160,7 @@ export default function LeafletMap({
   // ---- Inisialisasi peta (sekali) ------------------------------------------
   useEffect(() => {
     if (!containerRef.current) return;
-    const map = L.map(containerRef.current, { zoomControl: false, minZoom: 11, preferCanvas: false });
+    const map = L.map(containerRef.current, { zoomControl: false, minZoom: 10, preferCanvas: false });
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.control.scale({ position: "bottomright", imperial: false }).addTo(map);
 
@@ -229,12 +223,21 @@ export default function LeafletMap({
 
     choroplethRef.current = choropleth;
     labelGroupRef.current = L.layerGroup([], { pane: "regionLabels" });
-    map.fitBounds(choropleth.getBounds(), { padding: [20, 20] });
-    map.setMaxBounds(choropleth.getBounds().pad(0.6));
+    const batasKota = choropleth.getBounds();
+    map.fitBounds(batasKota, { padding: [20, 20] });
+    // Paling jauh cukup sampai seluruh kota muat. Lebih dari itu yang tampil
+    // hanya Kabupaten Bogor, dan batasnya ikut lebar peta supaya 68 kelurahan
+    // tetap terlihat utuh di layar sempit.
+    const kunciMinZoom = () => map.setMinZoom(map.getBoundsZoom(batasKota));
+    kunciMinZoom();
+    map.setMaxBounds(batasKota.pad(0.6));
     mapRef.current = map;
     state.current.onSiap?.();
 
-    const ro = new ResizeObserver(() => map.invalidateSize());
+    const ro = new ResizeObserver(() => {
+      map.invalidateSize();
+      kunciMinZoom();
+    });
     ro.observe(containerRef.current);
 
     return () => {
@@ -249,7 +252,7 @@ export default function LeafletMap({
     };
   }, [data]);
 
-  // ---- Basemap switcher (Terang / Satelit / Jalan OSM / Topografi) ----------
+  // ---- Basemap switcher (Terang / Satelit / Jalan OSM) ---------------------
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -260,14 +263,12 @@ export default function LeafletMap({
       attribution: cfg.attribution,
       maxZoom: cfg.maxZoom,
       maxNativeZoom: cfg.maxNativeZoom,
-      subdomains: "abcd",
     }).addTo(group);
     if (cfg.labelUrl) {
       L.tileLayer(cfg.labelUrl, {
         maxZoom: cfg.maxZoom,
         maxNativeZoom: cfg.maxNativeZoom,
-        subdomains: "abcd",
-        opacity: 0.85,
+          opacity: 0.85,
       }).addTo(group);
     }
     group.addTo(map);

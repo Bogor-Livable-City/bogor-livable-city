@@ -181,20 +181,26 @@ export function getKelurahanBySlug(slug: string): RankingRow | undefined {
   return ranking.find((r) => slugify(r.name) === slug.toLowerCase());
 }
 
-export function getIndicatorsForKelurahan(k: KelurahanProps): [string, string, string, string][] {
+export function getIndicatorsForKelurahan(
+  k: KelurahanProps
+): [string, string, string, string][] {
+  const m = (v: number) => `${Math.round(v).toLocaleString("id-ID")} m`;
+  // Dua belas indikator persis seperti gis/metodologi-skor.md: dua per dimensi,
+  // berbobot sama. K2 tidak disimpan sebagai satu angka karena bentuknya
+  // komposit, jadi ketiga jarak penyusunnya yang ditampilkan.
   return [
-    ["Cakupan layanan faskes gabungan", `${fmt(k.cakupan_faskes_pct, 1)}%`, "SIMDATA / Buffer 1 sampai 5 km", "2026"],
-    ["Cakupan puskesmas (radius 2 km)", `${fmt(k.cakupan_puskesmas_pct, 1)}%`, "Analisis Spasial Buffer", "2026"],
-    ["Jarak jaringan jalan ke puskesmas", `${Math.round(k.jarak_puskesmas_m).toLocaleString("id-ID")} m`, "OSM / Dijkstra Grid 75m", "2026"],
-    ["Jarak jaringan jalan ke rumah sakit", `${Math.round(k.jarak_rs_m).toLocaleString("id-ID")} m`, "OSM / Dijkstra Grid 75m", "2026"],
-    ["Jumlah fasilitas kesehatan (RS/PKM/Klinik)", `${k.n_rs} RS · ${k.n_puskesmas} PKM · ${k.n_klinik} Klinik`, "Dinkes / OSM", "2026"],
-    ["Jumlah sekolah (SD/SMP/SMA-SMK)", `${k.n_sd} SD · ${k.n_smp} SMP · ${k.n_sma_smk} SMA/SMK`, "Kemendikbud", "2026"],
-    ["Rasio sekolah per 10.000 penduduk", `${fmt(k.sekolah_per_10rb, 2)}`, "Olahan Tim", "2026"],
-    ["Jarak rata-rata jalan ke sekolah", `${Math.round(k.jarak_sekolah_m).toLocaleString("id-ID")} m`, "OSM / Dijkstra Grid 75m", "2026"],
-    ["Kepadatan penduduk", `${Math.round(k.kepadatan_jiwa_km2).toLocaleString("id-ID")} jiwa/km²`, "SIMDATA Kota Bogor", "2026"],
-    ["Tutupan vegetasi", `${fmt(k.vegetasi_pct, 1)}% (${fmt(k.vegetasi_m2_per_jiwa, 1)} m²/jiwa)`, "Penggunaan Lahan", "2023"],
-    ["Proporsi badan jalan & kerapatan jalan", `${fmt(k.badan_jalan_pct, 1)}% · ${fmt(k.kerapatan_jalan_km_km2, 1)} km/km²`, "RBI BIG & OSM", "2026"],
-    ["Kawasan perdagangan & industri", `${fmt(k.perdagangan_pct, 1)}% dagang · ${fmt(k.industri_pct, 2)}% industri`, "Penggunaan Lahan", "2023"],
+    ["Kesehatan", "Cakupan layanan faskes gabungan", `${fmt(k.cakupan_faskes_pct, 1)}%`, "Positif"],
+    ["Kesehatan", "Jarak komposit ke fasilitas kesehatan", `${m(k.jarak_puskesmas_m)} puskesmas · ${m(k.jarak_klinik_m)} klinik · ${m(k.jarak_rs_m)} RS`, "Negatif"],
+    ["Pendidikan", "Sekolah per 10.000 penduduk", fmt(k.sekolah_per_10rb, 2), "Positif"],
+    ["Pendidikan", "Jarak jaringan jalan ke sekolah", m(k.jarak_sekolah_m), "Negatif"],
+    ["Sosial kependudukan", "Kepadatan penduduk", `${Math.round(k.kepadatan_jiwa_km2).toLocaleString("id-ID")} jiwa/km²`, "Negatif"],
+    ["Sosial kependudukan", "Kriminalitas per 10.000 penduduk", fmt(k.kriminalitas_per_10rb, 2), "Negatif"],
+    ["Ekonomi", "Kawasan perdagangan", `${fmt(k.perdagangan_pct, 1)}% wilayah`, "Positif"],
+    ["Ekonomi", "Kawasan industri", `${fmt(k.industri_pct, 2)}% wilayah`, "Positif"],
+    ["Transportasi", "Badan jalan", `${fmt(k.badan_jalan_pct, 1)}% wilayah`, "Positif"],
+    ["Transportasi", "Kerapatan jaringan jalan", `${fmt(k.kerapatan_jalan_km_km2, 1)} km/km²`, "Positif"],
+    ["Lingkungan", "Tutupan vegetasi", `${fmt(k.vegetasi_pct, 1)}% wilayah`, "Positif"],
+    ["Lingkungan", "Vegetasi per penduduk", `${fmt(k.vegetasi_m2_per_jiwa, 1)} m²/jiwa`, "Positif"],
   ];
 }
 

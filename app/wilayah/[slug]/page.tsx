@@ -8,6 +8,7 @@ import { Icon, PageShell } from "../../components/ui";
 import {
   dimensions,
   getFunFacts,
+  getIndicatorsForKelurahan,
   getKelurahanBySlug,
   getMonografi,
   ranking,
@@ -233,6 +234,32 @@ async function RegionContent({
             </div>
           ))}
         </dl>
+      </section>
+
+      <section className="detail-section indicator-section">
+        <div className="section-heading">
+          <p className="eyebrow">Dua belas indikator penyusun skor</p>
+          <h2>Rincian indikator {name}.</h2>
+        </div>
+
+        <div className="data-table">
+          <div className="table-head">
+            <span>Dimensi</span>
+            <span>Indikator</span>
+            <span>Nilai</span>
+            <span>Arah</span>
+          </div>
+
+          {getIndicatorsForKelurahan(region).map((row, i) => (
+            <div className="table-row" key={i}>
+              {row.map((cell, j) => (
+                <span key={j} className={j === 2 ? "value-cell" : ""}>
+                  {cell}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="detail-section">
