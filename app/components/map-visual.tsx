@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { bogorSvgPaths } from "../lib/bogor-svg-paths";
 import { kelurahanData } from "../kelurahan-data";
 import { classes, scoreToColor, toSlug } from "../lib/livability";
@@ -47,7 +47,29 @@ function getDimensionScore(
   }
 }
 
-const ZOOM_LEVELS = [1, 1.3, 1.65];
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 2.2;
+const ZOOM_STEP = 1.3;
+
+// Titik tengah tiap kecamatan dihitung dari rata-rata titik pusat kelurahannya,
+// jadi labelnya ikut benar kalau geometri kelurahan berubah.
+const pusatKecamatan = Object.entries(
+  bogorSvgPaths.reduce<Record<string, { x: number; y: number; n: number }>>(
+    (acc, p) => {
+      const a = (acc[p.district] ??= { x: 0, y: 0, n: 0 });
+      a.x += p.cx;
+      a.y += p.cy;
+      a.n += 1;
+      return acc;
+    },
+    {}
+  )
+).map(([nama, a]) => ({ nama, x: a.x / a.n, y: a.y / a.n }));
+
+// ArrayLike dipakai supaya cocok dengan TouchList versi React maupun DOM.
+function jarakDuaJari(t: ArrayLike<{ clientX: number; clientY: number }>): number {
+  return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+}
 
 export function BogorMap({
   compact = false,
@@ -65,7 +87,8 @@ export function BogorMap({
   customScores?: Record<string, number>;
 }) {
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-  const [zoomIdx, setZoomIdx] = useState(0);
+  const [scale, setScale] = useState(ZOOM_MIN);
+  const cubitRef = useRef<{ jarak: number; scale: number } | null>(null);
 
   const activeSlug = hoveredSlug ?? (selected ? selectedSlug : null);
   const activeItem = activeSlug
@@ -75,10 +98,26 @@ export function BogorMap({
     ? getDimensionScore(activeSlug, dimension, customScores)
     : null;
 
-  const scale = ZOOM_LEVELS[zoomIdx] ?? 1;
-
   return (
-    <div className={`map-canvas ${compact ? "map-compact" : ""}`}>
+    <div
+      className={`map-canvas ${compact ? "map-compact" : ""}`}
+      // touch-action none supaya cubitan dibaca di sini, bukan oleh browser.
+      style={{ touchAction: "none" }}
+      onTouchStart={(e) => {
+        if (e.touches.length !== 2) return;
+        cubitRef.current = { jarak: jarakDuaJari(e.touches), scale };
+      }}
+      onTouchMove={(e) => {
+        if (e.touches.length !== 2 || !cubitRef.current) return;
+        const rasio = jarakDuaJari(e.touches) / cubitRef.current.jarak;
+        setScale(
+          Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, cubitRef.current.scale * rasio))
+        );
+      }}
+      onTouchEnd={(e) => {
+        if (e.touches.length === 0) cubitRef.current = null;
+      }}
+    >
       <div className="map-paper" aria-hidden="true" />
       <svg
         className="bogor-shape"
@@ -164,19 +203,22 @@ export function BogorMap({
               <circle r="3.5" fill="#fffefa" stroke="#0e5b53" strokeWidth="2" />
             </g>
           )}
+
+          {/* Nama enam kecamatan */}
+          {pusatKecamatan.map((k) => (
+            <text
+              key={k.nama}
+              className="kec-label"
+              x={k.x}
+              y={k.y}
+              textAnchor="middle"
+              aria-hidden="true"
+            >
+              {k.nama}
+            </text>
+          ))}
         </g>
       </svg>
-
-      {/* District callout labels */}
-      <div className="map-label label-one" aria-hidden="true">
-        Bogor Utara
-      </div>
-      <div className="map-label label-two" aria-hidden="true">
-        Bogor Tengah
-      </div>
-      <div className="map-label label-three" aria-hidden="true">
-        Bogor Selatan
-      </div>
 
       {/* Live interactive floating badge when hovering/selecting */}
       {activeItem && activeScore !== null && (
@@ -199,18 +241,16 @@ export function BogorMap({
             <button
               type="button"
               aria-label="Perbesar tampilan peta"
-              disabled={zoomIdx >= ZOOM_LEVELS.length - 1}
-              onClick={() =>
-                setZoomIdx((z) => Math.min(ZOOM_LEVELS.length - 1, z + 1))
-              }
+              disabled={scale >= ZOOM_MAX - 0.001}
+              onClick={() => setScale((s) => Math.min(ZOOM_MAX, s * ZOOM_STEP))}
             >
               +
             </button>
             <button
               type="button"
               aria-label="Perkecil tampilan peta"
-              disabled={zoomIdx <= 0}
-              onClick={() => setZoomIdx((z) => Math.max(0, z - 1))}
+              disabled={scale <= ZOOM_MIN + 0.001}
+              onClick={() => setScale((s) => Math.max(ZOOM_MIN, s / ZOOM_STEP))}
             >
               −
             </button>

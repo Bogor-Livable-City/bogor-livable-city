@@ -22,6 +22,12 @@ export type OverlayKey =
   | "jalan";
 export type Basemap = "light" | "satellite" | "osm" | "topo";
 
+// Leaflet tidak menyediakan jalan resmi ke elemen SVG-nya, padahal animasi
+// garis putus-putus saat hover hanya bisa dipasang lewat kelas CSS di situ.
+function jalurSvg(l: L.Path): SVGPathElement | undefined {
+  return (l as L.Path & { _path?: SVGPathElement })._path;
+}
+
 type Props = {
   data: FeatureCollection<Geometry, KelurahanProps>;
   theme: ThemeKey;
@@ -186,9 +192,17 @@ export default function LeafletMap({
         layer.on({
           mouseover: (e) => {
             const l = e.target as L.Path;
-            if (p.kode !== state.current.selectedKode) l.setStyle({ weight: 2.5, color: "#173b38" });
+            if (p.kode === state.current.selectedKode) return;
+            l.setStyle({ weight: 2.6, color: "#173b38", dashArray: "7 5" });
+            // Tetangga menimpa separuh garis batas kalau urutannya tidak diangkat.
+            l.bringToFront();
+            jalurSvg(l)?.classList.add("batas-hover");
           },
-          mouseout: (e) => choropleth.resetStyle(e.target as L.Path),
+          mouseout: (e) => {
+            const l = e.target as L.Path;
+            jalurSvg(l)?.classList.remove("batas-hover");
+            choropleth.resetStyle(l);
+          },
           click: () => state.current.onSelect(p.kode),
         });
       },

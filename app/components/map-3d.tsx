@@ -13,6 +13,10 @@ type Props = {
   onSelect: (kode: string | null) => void;
 };
 
+const SKALA_TINGGI = [0.5, 0.75, 1, 1.25, 1.5];
+const ZOOM_MIN = 0.65;
+const ZOOM_MAX = 2.4;
+
 type Ring2D = [number, number][];
 
 type PreparedFeature = {
@@ -56,6 +60,11 @@ function shadeHex(hex: string, factor: number): string {
   return `rgb(${r},${g},${b})`;
 }
 
+// ArrayLike dipakai supaya cocok dengan TouchList versi React maupun DOM.
+function jarakDuaJari(t: ArrayLike<{ clientX: number; clientY: number }>): number {
+  return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+}
+
 function pointInRing(px: number, py: number, ring: [number, number][]): boolean {
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -88,6 +97,9 @@ export default function Map3D({
     y: 0,
     moved: false,
   });
+
+  // Jarak dua jari saat cubitan dimulai, dipakai sebagai acuan rasio zoom.
+  const cubitRef = useRef<{ jarak: number; zoom: number } | null>(null);
 
   // Hit-test cache untuk klik & hover pada poligon atap 3D
   const hitPolysRef = useRef<{ kode: string; poly: [number, number][] }[]>([]);
@@ -377,7 +389,48 @@ export default function Map3D({
         }}
         onWheel={(e) => {
           e.preventDefault();
-          setZoom((z) => Math.max(0.65, Math.min(2.4, z * (e.deltaY < 0 ? 1.08 : 0.92))));
+          setZoom((z) => Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z * (e.deltaY < 0 ? 1.08 : 0.92))));
+        }}
+        // touch-action none supaya cubitan tidak diambil alih zoom bawaan browser.
+        style={{ touchAction: "none" }}
+        onTouchStart={(e) => {
+          if (e.touches.length === 2) {
+            cubitRef.current = { jarak: jarakDuaJari(e.touches), zoom };
+            dragRef.current.active = false;
+            return;
+          }
+          cubitRef.current = null;
+          const t = e.touches[0];
+          dragRef.current = { active: true, x: t.clientX, y: t.clientY, moved: false };
+        }}
+        onTouchMove={(e) => {
+          if (e.touches.length === 2 && cubitRef.current) {
+            const rasio = jarakDuaJari(e.touches) / cubitRef.current.jarak;
+            setZoom(
+              Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, cubitRef.current.zoom * rasio))
+            );
+            return;
+          }
+          if (e.touches.length !== 1 || !dragRef.current.active) return;
+          const t = e.touches[0];
+          const dx = t.clientX - dragRef.current.x;
+          const dy = t.clientY - dragRef.current.y;
+          if (Math.abs(dx) > 2 || Math.abs(dy) > 2) dragRef.current.moved = true;
+          dragRef.current.x = t.clientX;
+          dragRef.current.y = t.clientY;
+          setYaw((y) => y + dx * 0.008);
+          setPitch((p) => Math.max(0.35, Math.min(1.4, p - dy * 0.006)));
+        }}
+        onTouchEnd={(e) => {
+          if (e.touches.length > 0) return;
+          const wasMoved = dragRef.current.moved;
+          const cubitTadi = cubitRef.current !== null;
+          dragRef.current.active = false;
+          cubitRef.current = null;
+          if (wasMoved || cubitTadi || e.changedTouches.length !== 1) return;
+          const t = e.changedTouches[0];
+          const hit = findHitKode(t.clientX, t.clientY);
+          if (hit) onSelect(hit);
         }}
       />
 
@@ -385,23 +438,29 @@ export default function Map3D({
         <button
           type="button"
           onClick={() => setYaw((y) => y - 0.25)}
+          aria-label="Putar kiri"
           title="Putar kiri"
         >
-          ↺ Putar
+          ↺
         </button>
         <button
           type="button"
           onClick={() => setYaw((y) => y + 0.25)}
+          aria-label="Putar kanan"
           title="Putar kanan"
         >
           ↻
         </button>
         <button
           type="button"
-          onClick={() => setHeightScale((h) => (h >= 1.6 ? 0.7 : Number((h + 0.3).toFixed(1))))}
+          onClick={() =>
+            setHeightScale(
+              (h) => SKALA_TINGGI[(SKALA_TINGGI.indexOf(h) + 1) % SKALA_TINGGI.length]
+            )
+          }
           title="Ubah skala tinggi ekstrusi 3D"
         >
-          Tinggi {heightScale}×
+          Tinggi {heightScale.toLocaleString("id-ID")}×
         </button>
         <button
           type="button"

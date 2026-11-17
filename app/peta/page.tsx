@@ -571,21 +571,25 @@ export default function MapPage() {
 
         {selectedPlace && (
           <aside className="place-panel" aria-label="Detail kelurahan terpilih">
-            <button
-              type="button"
-              className="panel-close"
-              onClick={() => setSelectedKode(null)}
-              aria-label="Tutup panel detail kelurahan"
-            >
-              ×
-            </button>
             <div className="place-cover">
-              <span>{selectedPlace.kecamatan}</span>
-              <b>#{selectedPlace.peringkat}</b>
+              <div>
+                <p className="eyebrow">Kelurahan terpilih</p>
+                <h1>{selectedPlace.kelurahan}</h1>
+                <span>{selectedPlace.kecamatan}</span>
+              </div>
+              <div className="place-cover-kanan">
+                <button
+                  type="button"
+                  className="panel-close"
+                  onClick={() => setSelectedKode(null)}
+                  aria-label="Tutup panel detail kelurahan"
+                >
+                  ×
+                </button>
+                <b>#{selectedPlace.peringkat}</b>
+              </div>
             </div>
             <div className="place-content">
-              <p className="eyebrow">Kelurahan terpilih</p>
-              <h1>{selectedPlace.kelurahan}</h1>
               <div className="score-lockup">
                 <strong>{fmt(selectedPlace[theme])}</strong>
                 <span>

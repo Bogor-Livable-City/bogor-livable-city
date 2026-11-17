@@ -8,12 +8,11 @@ import { ScoreLegend } from "./map-visual";
 import { Icon } from "./ui";
 import { badgeHtml, SIMBOL_FASKES, SIMBOL_SEKOLAH, UKURAN_LEGENDA, type SimbolTitik } from "../lib/simbol";
 
-type Tab = "indeks" | "kesehatan" | "pendidikan";
+type Tab = "indeks" | "fasilitas";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "indeks", label: "Indeks" },
-  { key: "kesehatan", label: "Kesehatan" },
-  { key: "pendidikan", label: "Pendidikan" },
+  { key: "fasilitas", label: "Fasilitas" },
 ];
 
 function DaftarSimbol({ judul, simbol }: { judul: string; simbol: Record<string, SimbolTitik> }) {
@@ -40,7 +39,7 @@ export function LegendaPeta({ judulIndeks }: { judulIndeks: string }) {
   if (!tampil) {
     return (
       <button type="button" className="legend-buka" onClick={() => setTampil(true)}>
-        <Icon name="layers" size={15} />
+        <Icon name="compass" size={15} />
         Legenda
       </button>
     );
@@ -73,8 +72,12 @@ export function LegendaPeta({ judulIndeks }: { judulIndeks: string }) {
       </div>
       <div className="legend-tab-isi" role="tabpanel" key={tab}>
         {tab === "indeks" && <ScoreLegend title={judulIndeks} />}
-        {tab === "kesehatan" && <DaftarSimbol judul="Fasilitas Kesehatan" simbol={SIMBOL_FASKES} />}
-        {tab === "pendidikan" && <DaftarSimbol judul="Fasilitas Pendidikan" simbol={SIMBOL_SEKOLAH} />}
+        {tab === "fasilitas" && (
+          <>
+            <DaftarSimbol judul="Fasilitas Kesehatan" simbol={SIMBOL_FASKES} />
+            <DaftarSimbol judul="Fasilitas Pendidikan" simbol={SIMBOL_SEKOLAH} />
+          </>
+        )}
       </div>
     </div>
   );

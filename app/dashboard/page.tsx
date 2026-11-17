@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BogorMap } from "../components/map-visual";
+import { BogorMap, ScoreLegend } from "../components/map-visual";
 import { Icon, PageIntro, PageShell } from "../components/ui";
 import { dimensions, districts, kelurahanData } from "../data";
 import { classify, fmt } from "../lib/livability";
@@ -66,12 +66,7 @@ export default function DashboardPage() {
             </Link>
           </header>
           <BogorMap compact />
-          <div className="panel-legend">
-            <i />
-            <span>Rendah (0,00)</span>
-            <b />
-            <span>Tinggi (1,00)</span>
-          </div>
+          <ScoreLegend title="Indeks kelayakhunian" />
         </article>
 
         <article className="dashboard-panel dimensions-panel">

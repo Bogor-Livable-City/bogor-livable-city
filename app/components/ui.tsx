@@ -50,6 +50,12 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
         <path d="m3 12 9 5 9-5M3 17l9 5 9-5" />
       </>
     ),
+    compass: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="m15.6 8.4-2.1 5.1-5.1 2.1 2.1-5.1z" />
+      </>
+    ),
     arrow: (
       <>
         <path d="M5 12h14M13 6l6 6-6 6" />
@@ -158,6 +164,7 @@ const nav: [string, string, string][] = [
   ["/peringkat", "Peringkat", "rank"],
   ["/perbandingan", "Bandingkan", "compare"],
   ["/asisten", "Tanya Bogor", "bot"],
+  ["/metodologi", "Metodologi", "info"],
 ];
 
 export function Header() {
@@ -195,12 +202,6 @@ export function Header() {
           ))}
         </nav>
         <div className="header-actions">
-          <Link className="text-link" href="/metodologi">
-            Metodologi
-          </Link>
-          <Link className="button button-small header-cta" href="/peta">
-            Buka peta 68 kelurahan
-          </Link>
           <button
             type="button"
             className="mobile-menu-toggle"
@@ -232,14 +233,6 @@ export function Header() {
               <span>{label}</span>
             </Link>
           ))}
-          <Link
-            href="/metodologi"
-            className={pathname.startsWith("/metodologi") ? "active" : ""}
-            onClick={() => setMenuOpen(false)}
-          >
-            <Icon name="info" size={18} />
-            <span>Metodologi &amp; Sumber Data</span>
-          </Link>
         </nav>
       )}
     </header>

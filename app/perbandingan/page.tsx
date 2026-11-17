@@ -8,74 +8,8 @@ import {
   classify,
   dimensionKeys,
   fmt,
-  type KelurahanProps,
 } from "../lib/livability";
 
-const RAW_METRICS: {
-  label: string;
-  unit: string;
-  lowerGood?: boolean;
-  digits: number;
-  get: (k: KelurahanProps) => number;
-}[] = [
-  {
-    label: "Cakupan layanan faskes",
-    unit: "% permukiman",
-    digits: 1,
-    get: (k) => k.cakupan_faskes_pct,
-  },
-  {
-    label: "Jarak ke rumah sakit",
-    unit: "meter (jalan)",
-    lowerGood: true,
-    digits: 0,
-    get: (k) => k.jarak_rs_m,
-  },
-  {
-    label: "Jarak ke puskesmas",
-    unit: "meter (jalan)",
-    lowerGood: true,
-    digits: 0,
-    get: (k) => k.jarak_puskesmas_m,
-  },
-  {
-    label: "Rasio sekolah",
-    unit: "per 10.000 jiwa",
-    digits: 2,
-    get: (k) => k.sekolah_per_10rb,
-  },
-  {
-    label: "Kepadatan penduduk",
-    unit: "jiwa/km²",
-    lowerGood: true,
-    digits: 0,
-    get: (k) => k.kepadatan_jiwa_km2,
-  },
-  {
-    label: "Tutupan vegetasi",
-    unit: "% wilayah",
-    digits: 1,
-    get: (k) => k.vegetasi_pct,
-  },
-  {
-    label: "Vegetasi per kapita",
-    unit: "m²/jiwa",
-    digits: 1,
-    get: (k) => k.vegetasi_m2_per_jiwa,
-  },
-  {
-    label: "Kerapatan jalan",
-    unit: "km/km²",
-    digits: 1,
-    get: (k) => k.kerapatan_jalan_km_km2,
-  },
-  {
-    label: "Kawasan perdagangan",
-    unit: "% wilayah",
-    digits: 1,
-    get: (k) => k.perdagangan_pct,
-  },
-];
 
 function CompareContent() {
   const searchParams = useSearchParams();
@@ -246,33 +180,6 @@ function CompareContent() {
         })}
       </section>
 
-      <section className="compare-table">
-        <header>
-          <div>
-            <p className="eyebrow">Nilai indikator mentah</p>
-            <h2>Perbedaan di balik skor.</h2>
-          </div>
-        </header>
-        {RAW_METRICS.map((m) => {
-          const lv = m.get(left);
-          const rv = m.get(right);
-          const delta = lv - rv;
-          return (
-            <div key={m.label}>
-              <strong>
-                {m.label}
-                <small>{m.unit}</small>
-              </strong>
-              <span>{fmt(lv, m.digits)}</span>
-              <i className={m.lowerGood ? "lower-good" : ""}>
-                {delta >= 0 ? "+" : "−"}
-                {fmt(Math.abs(delta), m.digits)}
-              </i>
-              <span>{fmt(rv, m.digits)}</span>
-            </div>
-          );
-        })}
-      </section>
     </>
   );
 }
@@ -283,7 +190,7 @@ export default function ComparePage() {
       <PageIntro
         eyebrow="Perbandingan wilayah"
         title="Dua kelurahan, dibaca berdampingan."
-        description="Bandingkan indeks, enam dimensi, dan indikator mentah dari 68 kelurahan untuk memeriksa keunggulan tiap wilayah."
+        description="Bandingkan indeks dan enam dimensi dari 68 kelurahan untuk memeriksa keunggulan tiap wilayah."
       />
       <Suspense fallback={<p>Memuat perbandingan wilayah...</p>}>
         <CompareContent />

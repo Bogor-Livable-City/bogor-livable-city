@@ -197,3 +197,81 @@ export function getIndicatorsForKelurahan(k: KelurahanProps): [string, string, s
     ["Kawasan perdagangan & industri", `${fmt(k.perdagangan_pct, 1)}% dagang · ${fmt(k.industri_pct, 2)}% industri`, "Penggunaan Lahan", "2023"],
   ];
 }
+
+// Monografi dan fun fact diturunkan dari angka yang sudah ada di kelurahanData,
+// bukan teks yang ditulis satu per satu untuk 68 kelurahan.
+
+function peringkatMenurut(
+  kumpulan: KelurahanProps[],
+  k: KelurahanProps,
+  nilai: (x: KelurahanProps) => number
+): number {
+  return kumpulan.filter((x) => nilai(x) > nilai(k)).length + 1;
+}
+
+const rataKota = (nilai: (x: KelurahanProps) => number) =>
+  kelurahanData.reduce((s, x) => s + nilai(x), 0) / kelurahanData.length;
+
+export function getMonografi(k: RankingRow): [string, string][] {
+  const seKecamatan = kelurahanData.filter((x) => x.kecamatan === k.kecamatan);
+  return [
+    ["Kode wilayah", k.kode],
+    ["Kecamatan", `${k.kecamatan} (${seKecamatan.length} kelurahan)`],
+    ["Klasifikasi", k.kelas],
+    ["Peringkat kota", `#${k.peringkat} dari 68 kelurahan`],
+    [
+      "Peringkat di kecamatan",
+      `#${peringkatMenurut(seKecamatan, k, (x) => x.skor_livable)} dari ${seKecamatan.length}`,
+    ],
+    [
+      "Sarana kesehatan",
+      `${k.n_rs} rumah sakit · ${k.n_puskesmas} puskesmas · ${k.n_klinik} klinik`,
+    ],
+    ["Sarana pendidikan", `${k.n_sd} SD · ${k.n_smp} SMP · ${k.n_sma_smk} SMA/SMK`],
+    ["Tutupan vegetasi", `${fmt(k.vegetasi_pct, 1)}% dari luas wilayah`],
+    ["Kerapatan jalan", `${fmt(k.kerapatan_jalan_km_km2, 1)} km per km²`],
+    ["Guna lahan terbangun", `${fmt(k.perdagangan_pct, 1)}% dagang · ${fmt(k.industri_pct, 2)}% industri`],
+  ];
+}
+
+export function getFunFacts(k: RankingRow): string[] {
+  const seKecamatan = kelurahanData.filter((x) => x.kecamatan === k.kecamatan);
+  const fakta: string[] = [];
+
+  const urutanKec = peringkatMenurut(seKecamatan, k, (x) => x.skor_livable);
+  fakta.push(
+    urutanKec === 1
+      ? `Indeksnya paling tinggi di antara ${seKecamatan.length} kelurahan Kecamatan ${k.kecamatan}.`
+      : `Di Kecamatan ${k.kecamatan}, indeksnya ada di urutan ${urutanKec} dari ${seKecamatan.length} kelurahan.`
+  );
+
+  // Rekor tingkat kota dipakai hanya kalau kelurahan ini memang pemegangnya.
+  const rekor: [string, (x: KelurahanProps) => number, (v: number) => string][] = [
+    ["terpadat se-Kota Bogor", (x) => x.kepadatan_jiwa_km2, (v) => `${Math.round(v).toLocaleString("id-ID")} jiwa per km²`],
+    ["terluas se-Kota Bogor", (x) => x.luas_km2, (v) => `${fmt(v)} km²`],
+    ["berpenduduk terbanyak se-Kota Bogor", (x) => x.penduduk, (v) => `${v.toLocaleString("id-ID")} jiwa`],
+    ["paling hijau se-Kota Bogor", (x) => x.vegetasi_pct, (v) => `${fmt(v, 1)}% wilayahnya bervegetasi`],
+    ["dengan klinik terbanyak se-Kota Bogor", (x) => x.n_klinik, (v) => `${v} klinik`],
+    ["dengan sekolah terbanyak per penduduk", (x) => x.sekolah_per_10rb, (v) => `${fmt(v, 2)} sekolah per 10.000 jiwa`],
+  ];
+  for (const [julukan, nilai, tulis] of rekor) {
+    if (nilai(k) > 0 && peringkatMenurut(kelurahanData, k, nilai) === 1) {
+      fakta.push(`Kelurahan ${julukan}: ${tulis(nilai(k))}.`);
+      break;
+    }
+  }
+
+  const rataVeg = rataKota((x) => x.vegetasi_m2_per_jiwa);
+  const kali = k.vegetasi_m2_per_jiwa / rataVeg;
+  fakta.push(
+    `Ruang hijaunya ${fmt(k.vegetasi_m2_per_jiwa, 1)} m² per jiwa, ${
+      kali >= 1 ? `${fmt(kali, 1)} kali` : `${Math.round(kali * 100)}% dari`
+    } rata-rata kota yang ${fmt(rataVeg, 1)} m² per jiwa.`
+  );
+
+  fakta.push(
+    `Lewat jaringan jalan, permukiman di sini rata-rata ${Math.round(k.jarak_puskesmas_m).toLocaleString("id-ID")} m dari puskesmas terdekat dan ${Math.round(k.jarak_sekolah_m).toLocaleString("id-ID")} m dari sekolah terdekat.`
+  );
+
+  return fakta;
+}

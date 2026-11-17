@@ -1487,3 +1487,157 @@ html[data-splash="done"] .rb-site-stage {
     width: 100%;
   }
 }
+
+/* ---- Penyesuaian 18 November 2026 ---- */
+
+/* Batas kelurahan saat hover: garis putus-putus yang berjalan. */
+@keyframes batas-berjalan {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.batas-hover {
+  animation: batas-berjalan 0.65s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .batas-hover {
+    animation: none;
+  }
+}
+
+/* Navbar lebih ramping, menu utama dan Metodologi rata tengah. */
+.site-header {
+  height: 58px;
+}
+.header-inner {
+  padding: 0 24px;
+}
+.main-nav {
+  gap: 24px;
+  margin: 0 auto;
+}
+
+/* Kepala panel kelurahan: satu blok hijau berisi label, nama, dan kecamatan. */
+.place-cover {
+  height: auto;
+  min-height: 112px;
+  padding: 18px 18px 16px;
+  align-items: flex-start;
+  gap: 12px;
+}
+.place-cover .eyebrow {
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 2px;
+}
+.place-cover h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.08;
+  margin: 0 0 4px;
+  color: #fff;
+}
+.place-cover-kanan {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.place-cover .panel-close {
+  position: static;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 17px;
+  line-height: 1;
+}
+.place-cover .panel-close:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+.place-content > .score-lockup:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* Label kecamatan di peta SVG beranda dan dashboard. */
+.kec-label {
+  font-size: 7px;
+  font-weight: 700;
+  fill: #173b38;
+  paint-order: stroke;
+  stroke: #fffefa;
+  stroke-width: 2.6px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+/* Monografi dan fun fact pada halaman detail kelurahan. */
+.monografi {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+  margin: 0;
+}
+.monografi > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+.monografi dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+.monografi dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+}
+.fun-fact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.fun-fact li {
+  position: relative;
+  padding: 13px 16px 13px 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffefa;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.fun-fact li::before {
+  content: counter(list-item);
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+@media (max-width: 720px) {
+  .monografi {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* Legenda penuh di dashboard lebih tinggi dari legenda lama, jadi tinggi
+   kartunya dibiarkan mengikuti isi. */
+.city-map-panel {
+  height: auto;
+}
+.city-map-panel .legend-isi {
+  margin-top: 14px;
+}

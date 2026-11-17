@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { SelectAnimasi } from "../components/select";
 import { Icon, PageIntro, PageShell } from "../components/ui";
 import { districts, ranking } from "../data";
 import { classes, classify, fmt, slugify } from "../lib/livability";
@@ -16,7 +17,12 @@ export default function RankingPage() {
 
   const filtered = useMemo(() => {
     return ranking.filter((r) => {
-      if (query && !r.name.toLowerCase().includes(query.toLowerCase()))
+      const cari = query.trim().toLowerCase();
+      if (
+        cari &&
+        !r.name.toLowerCase().includes(cari) &&
+        !r.district.toLowerCase().includes(cari)
+      )
         return false;
       if (
         districtFilter !== "Semua kecamatan" &&
@@ -113,44 +119,38 @@ export default function RankingPage() {
             <Icon name="search" />
             <input
               value={query}
-              aria-label="Cari nama kelurahan"
+              aria-label="Cari kelurahan atau kecamatan"
               onChange={(e) => {
                 setQuery(e.target.value);
                 setPage(1);
               }}
-              placeholder="Cari kelurahan..."
+              placeholder="Cari Kelurahan / Kecamatan"
             />
           </label>
-          <select
-            aria-label="Filter kecamatan"
+          <SelectAnimasi
+            label="Filter kecamatan"
             value={districtFilter}
-            onChange={(e) => {
-              setDistrictFilter(e.target.value);
+            options={[
+              { value: "Semua kecamatan", label: "Semua kecamatan" },
+              ...districts.map((d) => ({ value: d.name, label: d.name })),
+            ]}
+            onChange={(v) => {
+              setDistrictFilter(v);
               setPage(1);
             }}
-          >
-            <option>Semua kecamatan</option>
-            {districts.map((d) => (
-              <option key={d.name} value={d.name}>
-                {d.name}
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label="Filter klasifikasi"
+          />
+          <SelectAnimasi
+            label="Filter klasifikasi"
             value={classFilter}
-            onChange={(e) => {
-              setClassFilter(e.target.value);
+            options={[
+              { value: "Semua klasifikasi", label: "Semua klasifikasi" },
+              ...classes.map((c) => ({ value: c.label, label: c.label })),
+            ]}
+            onChange={(v) => {
+              setClassFilter(v);
               setPage(1);
             }}
-          >
-            <option>Semua klasifikasi</option>
-            {classes.map((c) => (
-              <option key={c.label} value={c.label}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          />
           <button type="button" className="reset-button" onClick={reset}>
             Reset
           </button>

@@ -7,8 +7,9 @@ import { BogorMap } from "../../components/map-visual";
 import { Icon, PageShell } from "../../components/ui";
 import {
   dimensions,
-  getIndicatorsForKelurahan,
+  getFunFacts,
   getKelurahanBySlug,
+  getMonografi,
   ranking,
 } from "../../data";
 import { classify, fmt, slugify } from "../../lib/livability";
@@ -65,7 +66,6 @@ async function RegionContent({
   const district = region.district;
   const score = region.skor_livable;
   const scoreLabel = classify(score).label;
-  const regionIndicators = getIndicatorsForKelurahan(region);
 
   const regionDimensions = [
     {
@@ -219,33 +219,33 @@ async function RegionContent({
         </div>
       </section>
 
-      <section className="detail-section indicator-section">
+      <section className="detail-section">
         <div className="section-heading">
-          <p className="eyebrow">Nilai mentah</p>
-          <h2>Rincian indikator {name}.</h2>
+          <p className="eyebrow">Profil wilayah</p>
+          <h2>Monografi {name}.</h2>
         </div>
 
-        <div className="data-table">
-          <div className="table-head">
-            <span>Indikator</span>
-            <span>Nilai</span>
-            <span>Sumber</span>
-            <span>Tahun</span>
-          </div>
-
-          {regionIndicators.map((row, rowIndex) => (
-            <div className="table-row" key={rowIndex}>
-              {row.map((cell, cellIndex) => (
-                <span
-                  key={cellIndex}
-                  className={cellIndex === 1 ? "value-cell" : ""}
-                >
-                  {cell}
-                </span>
-              ))}
+        <dl className="monografi">
+          {getMonografi(region).map(([label, isi]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{isi}</dd>
             </div>
           ))}
+        </dl>
+      </section>
+
+      <section className="detail-section">
+        <div className="section-heading">
+          <p className="eyebrow">Tahukah kamu</p>
+          <h2>Beberapa hal tentang {name}.</h2>
         </div>
+
+        <ul className="fun-fact">
+          {getFunFacts(region).map((f) => (
+            <li key={f}>{f}</li>
+          ))}
+        </ul>
       </section>
 
       <section className="detail-cta">
