@@ -236,30 +236,44 @@ async function RegionContent({
         </dl>
       </section>
 
-      <section className="detail-section indicator-section">
+      <section className="detail-section compare-table indikator-table">
         <div className="section-heading">
           <p className="eyebrow">Dua belas indikator penyusun skor</p>
           <h2>Rincian indikator {name}.</h2>
         </div>
 
-        <div className="data-table">
-          <div className="table-head">
-            <span>Dimensi</span>
-            <span>Indikator</span>
-            <span>Nilai</span>
-            <span>Arah</span>
-          </div>
-
-          {getIndicatorsForKelurahan(region).map((row, i) => (
-            <div className="table-row" key={i}>
-              {row.map((cell, j) => (
-                <span key={j} className={j === 2 ? "value-cell" : ""}>
-                  {cell}
-                </span>
-              ))}
-            </div>
-          ))}
+        <div className="indikator-kepala">
+          <strong>Indikator</strong>
+          <span>{name}</span>
+          <i>Selisih</i>
+          <span>Rata-rata kota</span>
         </div>
+
+        {getIndicatorsForKelurahan(region).map((b) => {
+          const selisih =
+            b.nilai !== null && b.rataKota !== null ? b.nilai - b.rataKota : null;
+          // Untuk indikator negatif, berada di bawah rata-rata justru bagus.
+          const bagus = selisih !== null && (b.negatif ? selisih < 0 : selisih > 0);
+          return (
+            <div key={b.label}>
+              <strong>
+                {b.label}
+                <small>
+                  {b.dimensi} · {b.satuan}
+                </small>
+              </strong>
+              <span>{b.teksNilai ?? fmt(b.nilai as number, b.desimal)}</span>
+              <i className={bagus ? "" : "lower-good"}>
+                {selisih === null
+                  ? "—"
+                  : `${selisih >= 0 ? "+" : "−"}${fmt(Math.abs(selisih), b.desimal)}`}
+              </i>
+              <span>
+                {b.rataKota === null ? "—" : fmt(b.rataKota, b.desimal)}
+              </span>
+            </div>
+          );
+        })}
       </section>
 
       <section className="detail-section">

@@ -181,27 +181,63 @@ export function getKelurahanBySlug(slug: string): RankingRow | undefined {
   return ranking.find((r) => slugify(r.name) === slug.toLowerCase());
 }
 
-export function getIndicatorsForKelurahan(
-  k: KelurahanProps
-): [string, string, string, string][] {
-  const m = (v: number) => `${Math.round(v).toLocaleString("id-ID")} m`;
-  // Dua belas indikator persis seperti gis/metodologi-skor.md: dua per dimensi,
-  // berbobot sama. K2 tidak disimpan sebagai satu angka karena bentuknya
-  // komposit, jadi ketiga jarak penyusunnya yang ditampilkan.
-  return [
-    ["Kesehatan", "Cakupan layanan faskes gabungan", `${fmt(k.cakupan_faskes_pct, 1)}%`, "Positif"],
-    ["Kesehatan", "Jarak komposit ke fasilitas kesehatan", `${m(k.jarak_puskesmas_m)} puskesmas · ${m(k.jarak_klinik_m)} klinik · ${m(k.jarak_rs_m)} RS`, "Negatif"],
-    ["Pendidikan", "Sekolah per 10.000 penduduk", fmt(k.sekolah_per_10rb, 2), "Positif"],
-    ["Pendidikan", "Jarak jaringan jalan ke sekolah", m(k.jarak_sekolah_m), "Negatif"],
-    ["Sosial kependudukan", "Kepadatan penduduk", `${Math.round(k.kepadatan_jiwa_km2).toLocaleString("id-ID")} jiwa/km²`, "Negatif"],
-    ["Sosial kependudukan", "Kriminalitas per 10.000 penduduk", fmt(k.kriminalitas_per_10rb, 2), "Negatif"],
-    ["Ekonomi", "Kawasan perdagangan", `${fmt(k.perdagangan_pct, 1)}% wilayah`, "Positif"],
-    ["Ekonomi", "Kawasan industri", `${fmt(k.industri_pct, 2)}% wilayah`, "Positif"],
-    ["Transportasi", "Badan jalan", `${fmt(k.badan_jalan_pct, 1)}% wilayah`, "Positif"],
-    ["Transportasi", "Kerapatan jaringan jalan", `${fmt(k.kerapatan_jalan_km_km2, 1)} km/km²`, "Positif"],
-    ["Lingkungan", "Tutupan vegetasi", `${fmt(k.vegetasi_pct, 1)}% wilayah`, "Positif"],
-    ["Lingkungan", "Vegetasi per penduduk", `${fmt(k.vegetasi_m2_per_jiwa, 1)} m²/jiwa`, "Positif"],
-  ];
+export type BarisIndikator = {
+  dimensi: string;
+  label: string;
+  satuan: string;
+  nilai: number | null;
+  teksNilai?: string;
+  rataKota: number | null;
+  negatif: boolean;
+  desimal: number;
+};
+
+// Dua belas indikator penyusun skor, persis seperti gis/metodologi-skor.md:
+// dua per dimensi dengan bobot sama.
+const SPEK_INDIKATOR: {
+  dimensi: string;
+  label: string;
+  satuan: string;
+  negatif: boolean;
+  desimal: number;
+  ambil?: (k: KelurahanProps) => number;
+  teks?: (k: KelurahanProps) => string;
+}[] = [
+  { dimensi: "Kesehatan", label: "Cakupan layanan faskes gabungan", satuan: "% permukiman terlayani", negatif: false, desimal: 1, ambil: (k) => k.cakupan_faskes_pct },
+  {
+    dimensi: "Kesehatan",
+    label: "Jarak komposit ke fasilitas kesehatan",
+    satuan: "meter lewat jaringan jalan",
+    negatif: true,
+    desimal: 0,
+    // Komposit ini tidak disimpan sebagai satu angka, jadi yang ditampilkan
+    // ketiga jarak penyusunnya dan kolom pembandingnya dikosongkan.
+    teks: (k) =>
+      `${Math.round(k.jarak_puskesmas_m).toLocaleString("id-ID")} · ${Math.round(k.jarak_klinik_m).toLocaleString("id-ID")} · ${Math.round(k.jarak_rs_m).toLocaleString("id-ID")}`,
+  },
+  { dimensi: "Pendidikan", label: "Sekolah per 10.000 penduduk", satuan: "sekolah", negatif: false, desimal: 2, ambil: (k) => k.sekolah_per_10rb },
+  { dimensi: "Pendidikan", label: "Jarak jaringan jalan ke sekolah", satuan: "meter", negatif: true, desimal: 0, ambil: (k) => k.jarak_sekolah_m },
+  { dimensi: "Sosial kependudukan", label: "Kepadatan penduduk", satuan: "jiwa/km²", negatif: true, desimal: 0, ambil: (k) => k.kepadatan_jiwa_km2 },
+  { dimensi: "Sosial kependudukan", label: "Kriminalitas", satuan: "per 10.000 penduduk", negatif: true, desimal: 2, ambil: (k) => k.kriminalitas_per_10rb },
+  { dimensi: "Ekonomi", label: "Kawasan perdagangan", satuan: "% luas wilayah", negatif: false, desimal: 1, ambil: (k) => k.perdagangan_pct },
+  { dimensi: "Ekonomi", label: "Kawasan industri", satuan: "% luas wilayah", negatif: false, desimal: 2, ambil: (k) => k.industri_pct },
+  { dimensi: "Transportasi", label: "Badan jalan", satuan: "% luas wilayah", negatif: false, desimal: 1, ambil: (k) => k.badan_jalan_pct },
+  { dimensi: "Transportasi", label: "Kerapatan jaringan jalan", satuan: "km/km²", negatif: false, desimal: 1, ambil: (k) => k.kerapatan_jalan_km_km2 },
+  { dimensi: "Lingkungan", label: "Tutupan vegetasi", satuan: "% luas wilayah", negatif: false, desimal: 1, ambil: (k) => k.vegetasi_pct },
+  { dimensi: "Lingkungan", label: "Vegetasi per penduduk", satuan: "m²/jiwa", negatif: false, desimal: 1, ambil: (k) => k.vegetasi_m2_per_jiwa },
+];
+
+export function getIndicatorsForKelurahan(k: KelurahanProps): BarisIndikator[] {
+  return SPEK_INDIKATOR.map((spek) => ({
+    dimensi: spek.dimensi,
+    label: spek.label,
+    satuan: spek.satuan,
+    nilai: spek.ambil ? spek.ambil(k) : null,
+    teksNilai: spek.teks?.(k),
+    rataKota: spek.ambil ? rataKota(spek.ambil) : null,
+    negatif: spek.negatif,
+    desimal: spek.desimal,
+  }));
 }
 
 // Monografi dan fun fact diturunkan dari angka yang sudah ada di kelurahanData,

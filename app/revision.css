@@ -1710,13 +1710,6 @@ html[data-splash="done"] .rb-site-stage {
   justify-content: flex-end;
 }
 
-/* Kolom tabel indikator: Dimensi, Indikator, Nilai, Arah. */
-.indicator-section .data-table .table-head,
-.indicator-section .data-table .table-row {
-  grid-template-columns: 1.1fr 2fr 1.7fr 0.6fr;
-  gap: 10px;
-}
-
 /* Tinggi header dipakai ulang oleh beberapa layout. Setelah navbar
    dirampingkan, nilai 74px yang tertanam di stylesheet lain menyisakan strip
    kosong di bawah peta, jadi semuanya diikat ke satu variabel. */
@@ -1732,4 +1725,33 @@ html[data-splash="done"] .rb-site-stage {
 }
 .assistant-page > main {
   min-height: calc(100dvh - var(--tinggi-header));
+}
+
+/* Tabel indikator di halaman detail memakai tata letak yang sama dengan
+   tabel perbandingan: label dan satuan di kiri, angka serif di tengah. */
+.indikator-table {
+  margin-top: 0;
+}
+.indikator-kepala {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 0.5fr 1fr;
+  align-items: center;
+  padding-bottom: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.indikator-kepala > span,
+.indikator-kepala > i {
+  text-align: center;
+  font-style: normal;
+}
+.indikator-table > div span {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Judul bagian bukan baris indikator, jadi dikeluarkan dari grid tabel. */
+.indikator-table > .section-heading {
+  display: block;
+  margin-bottom: 18px;
 }
