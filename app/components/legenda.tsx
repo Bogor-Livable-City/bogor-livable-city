@@ -33,7 +33,8 @@ function DaftarSimbol({ judul, simbol }: { judul: string; simbol: Record<string,
 
 export function LegendaPeta({ judulIndeks }: { judulIndeks: string }) {
   const [tab, setTab] = useState<Tab>("indeks");
-  const [tampil, setTampil] = useState(true);
+  // Mulai tertutup supaya peta tidak langsung tertutup kartu saat dibuka.
+  const [tampil, setTampil] = useState(false);
 
   // Saat disembunyikan tetap bertuliskan "Legenda", supaya jelas ini apa.
   if (!tampil) {

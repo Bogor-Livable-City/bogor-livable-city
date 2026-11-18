@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 
 import { PetaKelurahan } from "../../components/map-visual";
-import { Icon, PageShell } from "../../components/ui";
+import { Icon, PageShell, TombolKembali } from "../../components/ui";
 import {
   dimensions,
   getFunFacts,
@@ -109,6 +109,8 @@ async function RegionContent({
 
   return (
     <PageShell className="detail-page">
+      <TombolKembali />
+
       <section className="detail-hero">
         <div>
           <h1>{name}</h1>
@@ -123,7 +125,7 @@ async function RegionContent({
               Bandingkan wilayah
             </Link>
 
-            <Link href="/peta" className="quiet-button">
+            <Link href={`/peta?kel=${slugify(name)}`} className="quiet-button">
               <Icon name="map" />
               Lihat di peta
             </Link>
@@ -131,7 +133,7 @@ async function RegionContent({
         </div>
 
         <div className="detail-score">
-          <span>Indeks kelayakhunian</span>
+          <span>Indeks Kelayakhunian</span>
           <strong>{fmt(score)}</strong>
           <b>{scoreLabel}</b>
           <small>Peringkat #{region.rank} dari 68 kelurahan</small>

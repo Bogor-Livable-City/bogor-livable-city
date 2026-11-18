@@ -1834,3 +1834,67 @@ html[data-splash="done"] .rb-site-stage {
   font-style: normal;
   color: var(--green);
 }
+
+/* Kelurahan di sekitar wilayah yang dibuka, supaya bingkainya tidak kosong. */
+.peta-sekitar path {
+  fill: #dde5dc;
+  stroke: #eef3ec;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.tombol-kembali {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px 0 10px;
+  margin-bottom: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffefa;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+  cursor: pointer;
+}
+.tombol-kembali:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+.tombol-kembali svg {
+  transform: scaleX(-1);
+}
+
+/* Kartu peta dan kartu skor per dimensi dibuat sama tinggi, dengan petanya
+   yang memanjang mengisi sisa ruang. */
+.dashboard-grid {
+  align-items: stretch;
+}
+.city-map-panel {
+  display: flex;
+  flex-direction: column;
+}
+.city-map-panel .map-canvas {
+  flex: 1;
+  height: auto;
+  min-height: 280px;
+}
+
+/* Di halaman perbandingan, select duduk di dalam kolom bersama ikon cari,
+   jadi harus memenuhi sisa lebarnya seperti <select> yang digantikannya. */
+.compare-picker .aselect {
+  flex: 1;
+  min-width: 0;
+}
+.compare-picker .aselect-tombol {
+  height: auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+}
+.compare-picker .aselect-tombol:hover {
+  border: 0;
+}

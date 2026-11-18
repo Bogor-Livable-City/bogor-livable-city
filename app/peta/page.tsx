@@ -69,11 +69,11 @@ export default function MapPage() {
   const [basemap, setBasemap] = useState<Basemap>("light");
   const [fillOpacity, setFillOpacity] = useState(0.75);
   const [overlays, setOverlays] = useState<Record<OverlayKey, boolean>>({
-    labels: true,
+    labels: false,
     kecamatan: true,
-    rs: true,
-    puskesmas: true,
-    klinik: true,
+    rs: false,
+    puskesmas: false,
+    klinik: false,
     sd: false,
     smp: false,
     sma_smk: false,
@@ -91,9 +91,16 @@ export default function MapPage() {
   // dan petunjuknya jadi hilang sebelum petanya kelihatan.
   const [petunjuk, setPetunjuk] = useState<"tampil" | "pudar" | "hilang">("tampil");
   const [petaSiap, setPetaSiap] = useState(false);
-  const [selectedKode, setSelectedKode] = useState<string | null>(
-    kelurahanData[0]?.kode ?? null
-  );
+  const [selectedKode, setSelectedKode] = useState<string | null>(null);
+
+  // Dibaca dari window, bukan useSearchParams, supaya halaman ini tidak perlu
+  // dibungkus Suspense hanya demi satu parameter.
+  useEffect(() => {
+    const kel = new URLSearchParams(window.location.search).get("kel");
+    if (!kel) return;
+    const target = kelurahanData.find((k) => slugify(k.kelurahan) === kel);
+    if (target) setSelectedKode(target.kode);
+  }, []);
 
   // Pencarian & filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -423,7 +430,7 @@ export default function MapPage() {
                   }}
                 >
                   <span className="base-osm" />
-                  Jalan (OSM)
+                  OpenStreetMap
                 </button>
               </div>
             </div>

@@ -50,7 +50,7 @@ export type ThemeKey =
   | "skor_lingkungan";
 
 export const themes: { key: ThemeKey; label: string; color: string }[] = [
-  { key: "skor_livable", label: "Indeks kelayakhunian", color: "#0e5b53" },
+  { key: "skor_livable", label: "Indeks Kelayakhunian", color: "#0e5b53" },
   { key: "skor_kesehatan", label: "Dimensi Kesehatan", color: "#0e5b53" },
   { key: "skor_pendidikan", label: "Dimensi Pendidikan", color: "#3f806f" },
   { key: "skor_sosial", label: "Dimensi Sosial kependudukan", color: "#6d9b78" },

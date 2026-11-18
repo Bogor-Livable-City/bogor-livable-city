@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { SelectAnimasi } from "../components/select";
 import { Icon, PageIntro, PageShell } from "../components/ui";
 import { kelurahanData } from "../data";
 import {
@@ -10,6 +11,11 @@ import {
   fmt,
 } from "../lib/livability";
 
+
+const opsiKelurahan = kelurahanData.map((k) => ({
+  value: k.kelurahan,
+  label: `#${k.peringkat} ${k.kelurahan} (${k.kecamatan})`,
+}));
 
 function CompareContent() {
   const searchParams = useSearchParams();
@@ -71,16 +77,12 @@ function CompareContent() {
           <span>Wilayah pertama</span>
           <div>
             <Icon name="search" />
-            <select
+            <SelectAnimasi
+              label="Pilih kelurahan pertama"
               value={leftName}
-              onChange={(e) => setLeftName(e.target.value)}
-            >
-              {kelurahanData.map((k) => (
-                <option key={k.kode} value={k.kelurahan}>
-                  #{k.peringkat} {k.kelurahan} ({k.kecamatan})
-                </option>
-              ))}
-            </select>
+              options={opsiKelurahan}
+              onChange={setLeftName}
+            />
           </div>
         </label>
         <button type="button" onClick={swap} aria-label="Tukar wilayah">
@@ -90,16 +92,12 @@ function CompareContent() {
           <span>Wilayah kedua</span>
           <div>
             <Icon name="search" />
-            <select
+            <SelectAnimasi
+              label="Pilih kelurahan kedua"
               value={rightName}
-              onChange={(e) => setRightName(e.target.value)}
-            >
-              {kelurahanData.map((k) => (
-                <option key={k.kode} value={k.kelurahan}>
-                  #{k.peringkat} {k.kelurahan} ({k.kecamatan})
-                </option>
-              ))}
-            </select>
+              options={opsiKelurahan}
+              onChange={setRightName}
+            />
           </div>
         </label>
       </section>

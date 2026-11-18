@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 export function Icon({ name, size = 18 }: { name: string; size?: number }) {
@@ -382,5 +382,23 @@ export function AdminHeader({
       </div>
       {action}
     </header>
+  );
+}
+
+export function TombolKembali() {
+  const router = useRouter();
+  return (
+    <button
+      type="button"
+      className="tombol-kembali"
+      // Kembali ke halaman sebelumnya; kalau halaman ini dibuka langsung dari
+      // tautan, riwayatnya kosong sehingga dialihkan ke peta.
+      onClick={() =>
+        window.history.length > 1 ? router.back() : router.push("/peta")
+      }
+    >
+      <Icon name="arrow" size={16} />
+      Kembali
+    </button>
   );
 }

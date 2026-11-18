@@ -66,7 +66,7 @@ export default function DashboardPage() {
             </Link>
           </header>
           <BogorMap compact />
-          <ScoreLegend title="Indeks kelayakhunian" ringkas />
+          <ScoreLegend title="Indeks Kelayakhunian" ringkas />
         </article>
 
         <article className="dashboard-panel dimensions-panel">

@@ -182,16 +182,15 @@ export function BogorMap({
             })}
           </g>
 
-          {/* Active kelurahan marker */}
           {activeItem && (
-            <g
-              className="map-active-beacon"
-              transform={`translate(${activeItem.cx}, ${activeItem.cy})`}
+            <path
+              d={activeItem.d}
+              fill="none"
+              stroke="#0b3f39"
+              strokeWidth="2.1"
+              strokeLinejoin="round"
               pointerEvents="none"
-            >
-              <circle r="8" className="beacon-pulse" />
-              <circle r="3.5" fill="#fffefa" stroke="#0e5b53" strokeWidth="2" />
-            </g>
+            />
           )}
 
           {/* Nama enam kecamatan */}
@@ -253,7 +252,7 @@ export function BogorMap({
 }
 
 export function ScoreLegend({
-  title = "Indeks kelayakhunian",
+  title = "Indeks Kelayakhunian",
   ringkas = false,
 }: {
   title?: string;
@@ -320,8 +319,9 @@ export function PetaKelurahan({ slug }: { slug: string }) {
   if (!item) return null;
 
   const b = kotakBatas(item.d);
-  // Kotak pandang dibuat bujur sangkar supaya bentuk wilayahnya tidak gepeng.
-  const sisi = Math.max(b.lebar, b.tinggi) * 1.34;
+  // Kotak pandang dibuat bujur sangkar supaya bentuk wilayahnya tidak gepeng,
+  // dan dilebihkan supaya kelurahan di sekitarnya ikut terlihat.
+  const sisi = Math.max(b.lebar, b.tinggi) * 2.1;
   const vb = [
     b.x0 + b.lebar / 2 - sisi / 2,
     b.y0 + b.tinggi / 2 - sisi / 2,
@@ -336,6 +336,13 @@ export function PetaKelurahan({ slug }: { slug: string }) {
       role="img"
       aria-label={`Bentuk wilayah Kelurahan ${item.name}`}
     >
+      <g className="peta-sekitar">
+        {bogorSvgPaths
+          .filter((p) => p.slug !== slug)
+          .map((p) => (
+            <path key={p.kode} d={p.d} />
+          ))}
+      </g>
       <path
         d={item.d}
         fill={scoreToColor(getDimensionScore(slug, "livable"))}
