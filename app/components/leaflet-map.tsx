@@ -180,13 +180,15 @@ export default function LeafletMap({
       const p = f.properties;
       const selected = p.kode === selectedKode;
       const visible = !visibleKodes || visibleKodes.has(p.kode);
+      // Begitu ada yang dipilih, sisanya dipudarkan supaya pilihannya menonjol.
+      const redup = selectedKode !== null && !selected;
       return {
         pane: "choropleth",
         fillColor: classify(p[theme]).color,
-        fillOpacity: visible ? fillOpacity : 0.1,
+        fillOpacity: visible ? (redup ? fillOpacity * 0.4 : fillOpacity) : 0.1,
         color: selected ? "#173b38" : "#ffffff",
         weight: selected ? 3 : 1.1,
-        opacity: visible ? 1 : 0.35,
+        opacity: visible ? (redup ? 0.7 : 1) : 0.35,
       };
     };
 
@@ -283,11 +285,15 @@ export default function LeafletMap({
       const p = l as L.Path;
       layer.resetStyle(p);
       bersihkanHover(p);
+      jalurSvg(p)?.classList.remove("poligon-terpilih");
     });
     if (selectedKode) {
       layer.eachLayer((l) => {
         const gl = l as L.Polygon & { feature?: Feature<Geometry, KelurahanProps> };
-        if (gl.feature?.properties.kode === selectedKode) gl.bringToFront();
+        if (gl.feature?.properties.kode === selectedKode) {
+          gl.bringToFront();
+          jalurSvg(gl)?.classList.add("poligon-terpilih");
+        }
       });
     }
   }, [theme, fillOpacity, visibleKodes, selectedKode]);

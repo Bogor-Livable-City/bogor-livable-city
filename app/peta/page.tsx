@@ -337,7 +337,7 @@ export default function MapPage() {
                 <input
                   type="range"
                   min={15}
-                  max={95}
+                  max={100}
                   aria-label="Transparansi poligon"
                   value={Math.round(fillOpacity * 100)}
                   onChange={(e) =>

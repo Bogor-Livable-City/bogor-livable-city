@@ -1898,3 +1898,15 @@ html[data-splash="done"] .rb-site-stage {
 .compare-picker .aselect-tombol:hover {
   border: 0;
 }
+
+/* Poligon yang sedang dipilih diberi bayangan supaya terbaca terangkat dari
+   kelurahan di sekitarnya, yang warnanya sudah dipudarkan. */
+.poligon-terpilih {
+  filter: drop-shadow(0 4px 7px rgba(11, 48, 44, 0.45));
+  transition: filter 0.2s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .poligon-terpilih {
+    transition: none;
+  }
+}
