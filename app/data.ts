@@ -256,20 +256,21 @@ const rataKota = (nilai: (x: KelurahanProps) => number) =>
 
 export function getMonografi(k: RankingRow): [string, string][] {
   const seKecamatan = kelurahanData.filter((x) => x.kecamatan === k.kecamatan);
+  const diKecamatan = peringkatMenurut(seKecamatan, k, (x) => x.skor_livable);
   // Urutan ini mengisi kolom kiri dulu (tiga baris pertama), lalu kolom kanan.
   return [
-    ["Kecamatan", `${k.kecamatan} (${seKecamatan.length} kelurahan)`],
+    ["Kecamatan", k.kecamatan],
     [
-      "Peringkat di kecamatan",
-      `#${peringkatMenurut(seKecamatan, k, (x) => x.skor_livable)} dari ${seKecamatan.length}`,
+      "Peringkat di Kecamatan",
+      `#${diKecamatan} dari ${seKecamatan.length} Kelurahan di Kecamatan ${k.kecamatan}`,
     ],
-    ["Peringkat kelurahan", `#${k.peringkat} dari 68 kelurahan`],
+    ["Peringkat Kelurahan", `#${k.peringkat} dari 68 Kelurahan di Kota Bogor`],
     ["Klasifikasi", k.kelas],
     [
-      "Sarana kesehatan",
-      `${k.n_rs} rumah sakit · ${k.n_puskesmas} puskesmas · ${k.n_klinik} klinik`,
+      "Sarana Kesehatan",
+      `${k.n_rs} Rumah Sakit · ${k.n_puskesmas} Puskesmas · ${k.n_klinik} Klinik`,
     ],
-    ["Sarana pendidikan", `${k.n_sd} SD · ${k.n_smp} SMP · ${k.n_sma_smk} SMA/SMK`],
+    ["Sarana Pendidikan", `${k.n_sd} SD · ${k.n_smp} SMP · ${k.n_sma_smk} SMA/SMK`],
   ];
 }
 

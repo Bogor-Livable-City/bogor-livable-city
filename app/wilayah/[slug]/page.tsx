@@ -113,10 +113,6 @@ async function RegionContent({
         <div>
           <h1>{name}</h1>
           <p className="detail-kecamatan">{district}</p>
-          <p>
-            Informasi indeks kelayakhunian wilayah berdasarkan enam dimensi
-            penilaian Kota Bogor.
-          </p>
 
           <div className="detail-actions">
             <Link

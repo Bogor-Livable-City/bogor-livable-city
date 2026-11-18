@@ -321,7 +321,7 @@ export function PetaKelurahan({ slug }: { slug: string }) {
 
   const b = kotakBatas(item.d);
   // Kotak pandang dibuat bujur sangkar supaya bentuk wilayahnya tidak gepeng.
-  const sisi = Math.max(b.lebar, b.tinggi) * 1.28;
+  const sisi = Math.max(b.lebar, b.tinggi) * 1.34;
   const vb = [
     b.x0 + b.lebar / 2 - sisi / 2,
     b.y0 + b.tinggi / 2 - sisi / 2,

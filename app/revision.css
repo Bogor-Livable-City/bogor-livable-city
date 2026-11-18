@@ -1783,10 +1783,9 @@ html[data-splash="done"] .rb-site-stage {
   background: #eef3ec;
 }
 .peta-kelurahan {
+  display: block;
   width: 100%;
   height: 100%;
-  padding: 18px;
-  overflow: visible;
 }
 
 .detail-kecamatan {
@@ -1815,4 +1814,23 @@ html[data-splash="done"] .rb-site-stage {
   font-family: inherit;
   font-size: 12px;
   line-height: 1.5;
+}
+
+/* Garis pemisah bawaan .compare-table ikut mengenai judul bagian dan baris
+   kepala tabel, jadi dimatikan di keduanya serta pada baris tepat sesudahnya. */
+.indikator-table > .section-heading,
+.indikator-table > .indikator-kepala,
+.indikator-table > .indikator-kepala + div {
+  border-top: 0;
+}
+
+/* Judul kolom disamakan ukurannya dengan "Pabaton" dan "Rata-rata kota"
+   yang sudah memakai serif dari .compare-table. */
+.indikator-table .indikator-kepala > strong,
+.indikator-table .indikator-kepala > i {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 17px;
+  font-style: normal;
+  color: var(--green);
 }
