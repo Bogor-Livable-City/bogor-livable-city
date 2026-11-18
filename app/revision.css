@@ -1910,3 +1910,23 @@ html[data-splash="done"] .rb-site-stage {
     transition: none;
   }
 }
+
+/* Kolom peta tidak boleh ikut melar mengikuti isinya. Elemen <canvas> punya
+   ukuran bawaan dari atribut width/height-nya, jadi begitu kolomnya tidak
+   dibatasi terjadi lingkaran setan: kanvas membesar, digambar ulang dengan
+   buffer lebih besar, lalu melar lagi. Itu yang terjadi saat panel detail
+   ditutup dan kolom petanya melebar. */
+.map-workspace > .interactive-map {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.map-3d-wrap {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+}
+.map-3d-wrap > canvas {
+  display: block;
+}

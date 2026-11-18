@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FeatureCollection, Geometry, Position } from "geojson";
 import { classify, fmt, type KelurahanProps, type ThemeKey } from "../lib/livability";
 import { usePinchZoom } from "../lib/pinch";
@@ -17,6 +17,14 @@ type Props = {
 const SKALA_TINGGI = [0.5, 0.75, 1, 1.25, 1.5];
 const ZOOM_MIN = 0.65;
 const ZOOM_MAX = 2.4;
+// pitch 0 berarti tegak lurus dari atas, 1,45 hampir sejajar permukaan.
+const PITCH_MIN = 0;
+const PITCH_MAX = 1.45;
+
+type Kamera = { yaw: number; pitch: number; zoom: number; pusatX: number; pusatY: number };
+
+const AWAL: Kamera = { yaw: -0.42, pitch: 0.92, zoom: 1.08, pusatX: 0, pusatY: 0 };
+const KUNCI_KAMERA = ["yaw", "pitch", "zoom", "pusatX", "pusatY"] as const;
 
 type Ring2D = [number, number][];
 
@@ -82,11 +90,14 @@ export default function Map3D({
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [yaw, setYaw] = useState(-0.42);
-  const [pitch, setPitch] = useState(0.92);
-  const [zoom, setZoom] = useState(1.08);
   const [heightScale, setHeightScale] = useState(1);
   const [hoveredKode, setHoveredKode] = useState<string | null>(null);
+
+  // Kamera disimpan di ref, bukan state: saat digeser nilainya berubah puluhan
+  // kali per detik dan React tidak perlu ikut merender ulang tiap kali.
+  const kamera = useRef<Kamera>({ ...AWAL });
+  const tujuan = useRef<Kamera>({ ...AWAL });
+  const perluGambar = useRef(true);
 
   const dragRef = useRef<{ active: boolean; x: number; y: number; moved: boolean }>({
     active: false,
@@ -140,18 +151,27 @@ export default function Map3D({
     });
   }, [data]);
 
-  useEffect(() => {
+  const gambar = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    if (rect.width < 1 || rect.height < 1) return;
+
+    // Menyetel canvas.width mengalokasikan ulang buffernya dan menghapus isinya,
+    // jadi hanya dilakukan kalau ukurannya memang berubah.
+    const dpr = window.devicePixelRatio || 1;
+    const lebarBuf = Math.round(rect.width * dpr);
+    const tinggiBuf = Math.round(rect.height * dpr);
+    if (canvas.width !== lebarBuf || canvas.height !== tinggiBuf) {
+      canvas.width = lebarBuf;
+      canvas.height = tinggiBuf;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+    const { yaw, pitch, zoom, pusatX, pusatY } = kamera.current;
     const w = rect.width;
     const h = rect.height;
     const scale = Math.min(w, h) * 0.41 * zoom;
@@ -160,9 +180,14 @@ export default function Map3D({
     const cosP = Math.cos(pitch);
     const sinP = Math.sin(pitch);
 
+    // Titik pusat pandangan ikut diputar, supaya kelurahan yang dipilih tetap
+    // di tengah layar berapa pun sudut putarnya.
+    const offX = pusatX * cosY - pusatY * sinY;
+    const offY = pusatX * sinY + pusatY * cosY;
+
     const project = (x: number, y: number, z: number): [number, number, number] => {
-      const rx = x * cosY - y * sinY;
-      const ry = x * sinY + y * cosY;
+      const rx = x * cosY - y * sinY - offX;
+      const ry = x * sinY + y * cosY - offY;
       const sx = w / 2 + rx * scale;
       const sy = h * 0.54 - ry * cosP * scale - z * sinP * scale;
       const depth = ry * sinP - z * cosP;
@@ -176,24 +201,21 @@ export default function Map3D({
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
 
-    // Grid alas 3D
+    // Grid alas 3D, digambar sebagai satu jalur
     ctx.strokeStyle = "rgba(14, 91, 83, 0.10)";
     ctx.lineWidth = 1;
+    ctx.beginPath();
     for (let g = -1.2; g <= 1.21; g += 0.3) {
       const [x1, y1] = project(g, -1.2, 0);
       const [x2, y2] = project(g, 1.2, 0);
-      ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
-      ctx.stroke();
-
       const [x3, y3] = project(-1.2, g, 0);
       const [x4, y4] = project(1.2, g, 0);
-      ctx.beginPath();
       ctx.moveTo(x3, y3);
       ctx.lineTo(x4, y4);
-      ctx.stroke();
     }
+    ctx.stroke();
 
     // Urutkan kelurahan dari belakang ke depan (Painter's algorithm)
     const sorted = [...prepared]
@@ -204,6 +226,9 @@ export default function Map3D({
         return { item, score, zTop, depth };
       })
       .sort((a, b) => b.depth - a.depth);
+
+    // Dari atas tegak lurus, dinding sampingnya tidak terlihat sama sekali.
+    const dindingTerlihat = sinP > 0.02;
 
     const newHitPolys: { kode: string; poly: [number, number][] }[] = [];
     const labelQueue: {
@@ -223,30 +248,34 @@ export default function Map3D({
       const z = isVisible ? (isSelected ? zTop + 0.035 : zTop) : 0.015;
 
       for (const ring of item.rings) {
-        const basePts = ring.map(([x, y]) => project(x, y, 0));
         const topPts = ring.map(([x, y]) => project(x, y, z));
 
-        // Gambar dinding samping poligon (ekstrusi)
-        ctx.fillStyle = isVisible
-          ? shadeHex(baseColor, isSelected ? 0.68 : 0.76)
-          : "rgba(180, 192, 185, 0.35)";
-        ctx.strokeStyle = isVisible
-          ? shadeHex(baseColor, 0.62)
-          : "rgba(160, 175, 168, 0.25)";
-        ctx.lineWidth = 0.6;
+        if (dindingTerlihat) {
+          const basePts = ring.map(([x, y]) => project(x, y, 0));
 
-        for (let i = 0; i < ring.length - 1; i++) {
-          const b1 = basePts[i];
-          const b2 = basePts[i + 1];
-          const t2 = topPts[i + 1];
-          const t1 = topPts[i];
+          // Seluruh dinding satu kelurahan digambar sebagai satu jalur. Kalau
+          // tiap sisi digambar sendiri-sendiri, 8.800 titik batas berubah jadi
+          // belasan ribu panggilan fill dan stroke tiap frame.
+          ctx.fillStyle = isVisible
+            ? shadeHex(baseColor, isSelected ? 0.68 : 0.76)
+            : "rgba(180, 192, 185, 0.35)";
+          ctx.strokeStyle = isVisible
+            ? shadeHex(baseColor, 0.62)
+            : "rgba(160, 175, 168, 0.25)";
+          ctx.lineWidth = 0.6;
 
           ctx.beginPath();
-          ctx.moveTo(b1[0], b1[1]);
-          ctx.lineTo(b2[0], b2[1]);
-          ctx.lineTo(t2[0], t2[1]);
-          ctx.lineTo(t1[0], t1[1]);
-          ctx.closePath();
+          for (let i = 0; i < ring.length - 1; i++) {
+            const b1 = basePts[i];
+            const b2 = basePts[i + 1];
+            const t2 = topPts[i + 1];
+            const t1 = topPts[i];
+            ctx.moveTo(b1[0], b1[1]);
+            ctx.lineTo(b2[0], b2[1]);
+            ctx.lineTo(t2[0], t2[1]);
+            ctx.lineTo(t1[0], t1[1]);
+            ctx.closePath();
+          }
           ctx.fill();
           ctx.stroke();
         }
@@ -332,7 +361,85 @@ export default function Map3D({
     }
 
     hitPolysRef.current = newHitPolys;
-  }, [prepared, theme, selectedKode, hoveredKode, visibleKodes, showLabels, yaw, pitch, zoom, heightScale]);
+  }, [prepared, theme, selectedKode, hoveredKode, visibleKodes, showLabels, heightScale]);
+
+  // Disimpan di ref supaya gelung animasi di bawah cukup dipasang sekali.
+  const gambarRef = useRef(gambar);
+  gambarRef.current = gambar;
+
+  useEffect(() => {
+    perluGambar.current = true;
+  }, [gambar]);
+
+  // Satu gelung requestAnimationFrame mengurus easing kamera sekaligus
+  // menggambar, jadi beberapa perubahan dalam satu frame cukup sekali gambar.
+  useEffect(() => {
+    let hidup = true;
+    let id = 0;
+    const langkah = () => {
+      if (!hidup) return;
+      const k = kamera.current;
+      const t = tujuan.current;
+      let bergerak = false;
+      for (const kunci of KUNCI_KAMERA) {
+        const selisih = t[kunci] - k[kunci];
+        if (Math.abs(selisih) > 0.0004) {
+          k[kunci] += selisih * 0.16;
+          bergerak = true;
+        } else {
+          k[kunci] = t[kunci];
+        }
+      }
+      if (bergerak || perluGambar.current) {
+        perluGambar.current = false;
+        gambarRef.current();
+      }
+      id = requestAnimationFrame(langkah);
+    };
+    id = requestAnimationFrame(langkah);
+    return () => {
+      hidup = false;
+      cancelAnimationFrame(id);
+    };
+  }, []);
+
+  // Lebar kanvas berubah saat panel detail dibuka atau ditutup; tanpa ini
+  // gambarnya tetap memakai ukuran lama sehingga tampak melar dan bergeser.
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      perluGambar.current = true;
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Memilih kelurahan membawa pandangan tegak lurus dari atas ke wilayah itu;
+  // menutup panelnya mengembalikan pandangan semula.
+  useEffect(() => {
+    const t = tujuan.current;
+    const f = selectedKode
+      ? prepared.find((p) => p.props.kode === selectedKode)
+      : undefined;
+    if (f) {
+      t.pusatX = f.centroid[0];
+      t.pusatY = f.centroid[1];
+      t.yaw = 0;
+      t.pitch = 0.06;
+      t.zoom = 2;
+    } else {
+      Object.assign(t, AWAL);
+    }
+  }, [selectedKode, prepared]);
+
+  usePinchZoom(
+    wrapRef,
+    (rasio, awal) => {
+      tujuan.current.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, awal * rasio));
+    },
+    () => tujuan.current.zoom
+  );
 
   const findHitKode = (clientX: number, clientY: number): string | null => {
     const canvas = canvasRef.current;
@@ -348,11 +455,24 @@ export default function Map3D({
     return null;
   };
 
-  usePinchZoom(
-    wrapRef,
-    (rasio, awal) => setZoom(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, awal * rasio))),
-    () => zoom
-  );
+  // Saat digeser, kamera dan tujuannya digerakkan bersamaan supaya tidak
+  // tertinggal di belakang jari atau kursor.
+  const geser = (dx: number, dy: number) => {
+    const k = kamera.current;
+    const t = tujuan.current;
+    t.yaw = k.yaw + dx * 0.008;
+    t.pitch = Math.max(PITCH_MIN, Math.min(PITCH_MAX, k.pitch - dy * 0.006));
+    k.yaw = t.yaw;
+    k.pitch = t.pitch;
+    perluGambar.current = true;
+  };
+
+  const ubahZoom = (faktor: number) => {
+    tujuan.current.zoom = Math.max(
+      ZOOM_MIN,
+      Math.min(ZOOM_MAX, tujuan.current.zoom * faktor)
+    );
+  };
 
   return (
     <div className="map-3d-wrap" ref={wrapRef}>
@@ -369,8 +489,7 @@ export default function Map3D({
             if (Math.abs(dx) > 2 || Math.abs(dy) > 2) dragRef.current.moved = true;
             dragRef.current.x = e.clientX;
             dragRef.current.y = e.clientY;
-            setYaw((y) => y + dx * 0.008);
-            setPitch((p) => Math.max(0.35, Math.min(1.4, p - dy * 0.006)));
+            geser(dx, dy);
           } else {
             setHoveredKode(findHitKode(e.clientX, e.clientY));
           }
@@ -389,7 +508,7 @@ export default function Map3D({
         }}
         onWheel={(e) => {
           e.preventDefault();
-          setZoom((z) => Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z * (e.deltaY < 0 ? 1.08 : 0.92))));
+          ubahZoom(e.deltaY < 0 ? 1.08 : 0.92);
         }}
         // Satu jari memutar, jadi tidak ada gestur halaman yang perlu lewat.
         style={{ touchAction: "none" }}
@@ -409,8 +528,7 @@ export default function Map3D({
           if (Math.abs(dx) > 2 || Math.abs(dy) > 2) dragRef.current.moved = true;
           dragRef.current.x = t.clientX;
           dragRef.current.y = t.clientY;
-          setYaw((y) => y + dx * 0.008);
-          setPitch((p) => Math.max(0.35, Math.min(1.4, p - dy * 0.006)));
+          geser(dx, dy);
         }}
         onTouchEnd={(e) => {
           if (e.touches.length > 0) return;
@@ -426,7 +544,9 @@ export default function Map3D({
       <div className="map-3d-controls">
         <button
           type="button"
-          onClick={() => setYaw((y) => y - 0.25)}
+          onClick={() => {
+            tujuan.current.yaw -= 0.25;
+          }}
           aria-label="Putar kiri"
           title="Putar kiri"
         >
@@ -434,11 +554,22 @@ export default function Map3D({
         </button>
         <button
           type="button"
-          onClick={() => setYaw((y) => y + 0.25)}
+          onClick={() => {
+            tujuan.current.yaw += 0.25;
+          }}
           aria-label="Putar kanan"
           title="Putar kanan"
         >
           ↻
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            tujuan.current.pitch = tujuan.current.pitch < 0.2 ? AWAL.pitch : PITCH_MIN;
+          }}
+          title="Lihat tegak lurus dari atas, atau kembali miring"
+        >
+          Dari atas
         </button>
         <button
           type="button"
@@ -454,9 +585,7 @@ export default function Map3D({
         <button
           type="button"
           onClick={() => {
-            setYaw(-0.42);
-            setPitch(0.92);
-            setZoom(1.08);
+            Object.assign(tujuan.current, AWAL);
             setHeightScale(1);
           }}
         >
@@ -466,4 +595,3 @@ export default function Map3D({
     </div>
   );
 }
-
