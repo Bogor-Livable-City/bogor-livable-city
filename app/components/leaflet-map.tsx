@@ -160,7 +160,14 @@ export default function LeafletMap({
   // ---- Inisialisasi peta (sekali) ------------------------------------------
   useEffect(() => {
     if (!containerRef.current) return;
-    const map = L.map(containerRef.current, { zoomControl: false, minZoom: 10, preferCanvas: false });
+    // zoomSnap 0,5 supaya batas zoom terjauh bisa setengah tingkat lebih lebar
+    // daripada "seluruh kota pas muat", yang terasa terlalu rapat.
+    const map = L.map(containerRef.current, {
+      zoomControl: false,
+      minZoom: 10,
+      zoomSnap: 0.5,
+      preferCanvas: false,
+    });
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.control.scale({ position: "bottomright", imperial: false }).addTo(map);
 
@@ -230,7 +237,9 @@ export default function LeafletMap({
     // Paling jauh cukup sampai seluruh kota muat. Lebih dari itu yang tampil
     // hanya Kabupaten Bogor, dan batasnya ikut lebar peta supaya 68 kelurahan
     // tetap terlihat utuh di layar sempit.
-    const kunciMinZoom = () => map.setMinZoom(map.getBoundsZoom(batasKota));
+    // getBoundsZoom ikut membulatkan menurut zoomSnap, jadi dikurangi satu
+    // tingkat penuh supaya benar-benar lebih lebar daripada "pas muat".
+    const kunciMinZoom = () => map.setMinZoom(map.getBoundsZoom(batasKota) - 1);
     kunciMinZoom();
     map.setMaxBounds(batasKota.pad(0.6));
     mapRef.current = map;
@@ -344,7 +353,12 @@ export default function LeafletMap({
   useEffect(() => {
     const map = mapRef.current;
     const layer = choroplethRef.current;
-    if (!map || !layer || !selectedKode) return;
+    if (!map || !layer) return;
+    // Panel ditutup: pandangan dikembalikan ke seluruh kota, seperti di 3D.
+    if (!selectedKode) {
+      map.flyToBounds(layer.getBounds(), { padding: [20, 20], duration: 0.8 });
+      return;
+    }
     layer.eachLayer((l) => {
       const gl = l as L.Polygon & { feature?: Feature<Geometry, KelurahanProps> };
       if (gl.feature?.properties.kode === selectedKode) {

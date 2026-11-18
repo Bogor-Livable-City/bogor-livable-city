@@ -17,9 +17,11 @@ type Props = {
 const SKALA_TINGGI = [0.5, 0.75, 1, 1.25, 1.5];
 const ZOOM_MIN = 0.65;
 const ZOOM_MAX = 2.4;
-// pitch 0 berarti tegak lurus dari atas, 1,45 hampir sejajar permukaan.
+// pitch 0 berarti tegak lurus dari atas. Di atas 1,2 tinggi petanya tinggal
+// sepertiga sementara balok ekstrusinya hampir penuh, jadi bentuk wilayahnya
+// sudah tidak terbaca lagi.
 const PITCH_MIN = 0;
-const PITCH_MAX = 1.45;
+const PITCH_MAX = 1.2;
 
 type Kamera = { yaw: number; pitch: number; zoom: number; pusatX: number; pusatY: number };
 
