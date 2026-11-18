@@ -7,7 +7,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect, useRef } from "react";
 import type { Feature, FeatureCollection, Geometry, Position } from "geojson";
-import { classify, fmt, type KelurahanProps, type ThemeKey } from "../lib/livability";
+import { classify, fmt, shadeHex, type KelurahanProps, type ThemeKey } from "../lib/livability";
 import { badgeHtml, SIMBOL_FASKES, SIMBOL_SEKOLAH, UKURAN_PETA, type SimbolTitik } from "../lib/simbol";
 
 export type OverlayKey =
@@ -34,6 +34,16 @@ function jalurSvg(l: L.Path): SVGPathElement | undefined {
 function bersihkanHover(l: L.Path) {
   jalurSvg(l)?.classList.remove("batas-hover");
   l.setStyle({ dashArray: undefined });
+}
+
+// Sidebar kiri selebar 272px membuat Kota Bogor tampak miring ke kanan relatif
+// jendela, jadi titik pandangnya digeser separuh lebar sidebar.
+const GESER_SIDEBAR = 136;
+
+function pandanganKota(map: L.Map, batas: L.LatLngBounds) {
+  const zoom = map.getBoundsZoom(batas, false, L.point(20, 20));
+  const titik = map.project(batas.getCenter(), zoom).add(L.point(GESER_SIDEBAR, 0));
+  return { pusat: map.unproject(titik, zoom), zoom };
 }
 
 // Poligon terpilih harus kembali paling depan setelah tetangganya diangkat
@@ -214,7 +224,12 @@ export default function LeafletMap({
           mouseover: (e) => {
             const l = e.target as L.Path;
             if (p.kode === state.current.selectedKode) return;
-            l.setStyle({ weight: 2.6, color: "#173b38", dashArray: "7 5" });
+            l.setStyle({
+              weight: 2.6,
+              color: "#173b38",
+              dashArray: "7 5",
+              fillColor: shadeHex(classify(p[state.current.theme]).color, 1.12),
+            });
             // Tetangga menimpa separuh garis batas kalau urutannya tidak diangkat.
             l.bringToFront();
             jalurSvg(l)?.classList.add("batas-hover");
@@ -233,7 +248,8 @@ export default function LeafletMap({
     choroplethRef.current = choropleth;
     labelGroupRef.current = L.layerGroup([], { pane: "regionLabels" });
     const batasKota = choropleth.getBounds();
-    map.fitBounds(batasKota, { padding: [20, 20] });
+    const awal = pandanganKota(map, batasKota);
+    map.setView(awal.pusat, awal.zoom);
     // Paling jauh cukup sampai seluruh kota muat. Lebih dari itu yang tampil
     // hanya Kabupaten Bogor, dan batasnya ikut lebar peta supaya 68 kelurahan
     // tetap terlihat utuh di layar sempit.
@@ -241,7 +257,9 @@ export default function LeafletMap({
     // tingkat penuh supaya benar-benar lebih lebar daripada "pas muat".
     const kunciMinZoom = () => map.setMinZoom(map.getBoundsZoom(batasKota) - 1);
     kunciMinZoom();
-    map.setMaxBounds(batasKota.pad(0.6));
+    // Batas panning harus lebih lebar daripada layar. Kalau lebih sempit,
+    // Leaflet memaksa peta ke tengah batasnya dan geseran di atas batal.
+    map.setMaxBounds(batasKota.pad(1.6));
     mapRef.current = map;
     state.current.onSiap?.();
 
@@ -356,7 +374,8 @@ export default function LeafletMap({
     if (!map || !layer) return;
     // Panel ditutup: pandangan dikembalikan ke seluruh kota, seperti di 3D.
     if (!selectedKode) {
-      map.flyToBounds(layer.getBounds(), { padding: [20, 20], duration: 0.8 });
+      const v = pandanganKota(map, layer.getBounds());
+      map.flyTo(v.pusat, v.zoom, { duration: 0.8 });
       return;
     }
     layer.eachLayer((l) => {

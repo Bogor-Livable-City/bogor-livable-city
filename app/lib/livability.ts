@@ -83,5 +83,15 @@ export const fmt = (n: number, digits = 2) =>
 export const slugify = (name: string) => name.toLowerCase().trim().replace(/\s+/g, "-");
 
 export const scoreToColor = (score: number) => classify(score).color;
+
+// Menggelapkan atau mencerahkan warna heksadesimal. Dipakai peta 3D untuk
+// dinding ekstrusi dan peta 2D untuk sorotan saat hover.
+export function shadeHex(hex: string, factor: number): string {
+  const clean = hex.replace("#", "");
+  const komponen = [0, 2, 4].map((i) =>
+    Math.min(255, Math.max(0, Math.round(parseInt(clean.slice(i, i + 2), 16) * factor)))
+  );
+  return `rgb(${komponen.join(",")})`;
+}
 export const scoreToClass = (score: number) => classify(score).label;
 export const toSlug = slugify;

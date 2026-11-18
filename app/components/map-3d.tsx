@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FeatureCollection, Geometry, Position } from "geojson";
-import { classify, fmt, type KelurahanProps, type ThemeKey } from "../lib/livability";
+import { classify, fmt, shadeHex, type KelurahanProps, type ThemeKey } from "../lib/livability";
 import { usePinchZoom } from "../lib/pinch";
 
 type Props = {
@@ -63,13 +63,6 @@ function ringCentroid(ring: Ring2D): [number, number, number] {
   return [cx / (6 * area), cy / (6 * area), Math.abs(area)];
 }
 
-function shadeHex(hex: string, factor: number): string {
-  const clean = hex.replace("#", "");
-  const r = Math.min(255, Math.max(0, Math.round(parseInt(clean.slice(0, 2), 16) * factor)));
-  const g = Math.min(255, Math.max(0, Math.round(parseInt(clean.slice(2, 4), 16) * factor)));
-  const b = Math.min(255, Math.max(0, Math.round(parseInt(clean.slice(4, 6), 16) * factor)));
-  return `rgb(${r},${g},${b})`;
-}
 
 function pointInRing(px: number, py: number, ring: [number, number][]): boolean {
   let inside = false;
