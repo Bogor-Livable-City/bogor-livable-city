@@ -213,7 +213,7 @@ const SPEK_INDIKATOR: {
     // Komposit ini tidak disimpan sebagai satu angka, jadi yang ditampilkan
     // ketiga jarak penyusunnya dan kolom pembandingnya dikosongkan.
     teks: (k) =>
-      `${Math.round(k.jarak_puskesmas_m).toLocaleString("id-ID")} · ${Math.round(k.jarak_klinik_m).toLocaleString("id-ID")} · ${Math.round(k.jarak_rs_m).toLocaleString("id-ID")}`,
+      `Puskesmas ${Math.round(k.jarak_puskesmas_m).toLocaleString("id-ID")} · Klinik ${Math.round(k.jarak_klinik_m).toLocaleString("id-ID")} · RS ${Math.round(k.jarak_rs_m).toLocaleString("id-ID")}`,
   },
   { dimensi: "Pendidikan", label: "Sekolah per 10.000 penduduk", satuan: "sekolah", negatif: false, desimal: 2, ambil: (k) => k.sekolah_per_10rb },
   { dimensi: "Pendidikan", label: "Jarak jaringan jalan ke sekolah", satuan: "meter", negatif: true, desimal: 0, ambil: (k) => k.jarak_sekolah_m },
@@ -256,23 +256,20 @@ const rataKota = (nilai: (x: KelurahanProps) => number) =>
 
 export function getMonografi(k: RankingRow): [string, string][] {
   const seKecamatan = kelurahanData.filter((x) => x.kecamatan === k.kecamatan);
+  // Urutan ini mengisi kolom kiri dulu (tiga baris pertama), lalu kolom kanan.
   return [
-    ["Kode wilayah", k.kode],
     ["Kecamatan", `${k.kecamatan} (${seKecamatan.length} kelurahan)`],
-    ["Klasifikasi", k.kelas],
-    ["Peringkat kota", `#${k.peringkat} dari 68 kelurahan`],
     [
       "Peringkat di kecamatan",
       `#${peringkatMenurut(seKecamatan, k, (x) => x.skor_livable)} dari ${seKecamatan.length}`,
     ],
+    ["Peringkat kelurahan", `#${k.peringkat} dari 68 kelurahan`],
+    ["Klasifikasi", k.kelas],
     [
       "Sarana kesehatan",
       `${k.n_rs} rumah sakit · ${k.n_puskesmas} puskesmas · ${k.n_klinik} klinik`,
     ],
     ["Sarana pendidikan", `${k.n_sd} SD · ${k.n_smp} SMP · ${k.n_sma_smk} SMA/SMK`],
-    ["Tutupan vegetasi", `${fmt(k.vegetasi_pct, 1)}% dari luas wilayah`],
-    ["Kerapatan jalan", `${fmt(k.kerapatan_jalan_km_km2, 1)} km per km²`],
-    ["Guna lahan terbangun", `${fmt(k.perdagangan_pct, 1)}% dagang · ${fmt(k.industri_pct, 2)}% industri`],
   ];
 }
 

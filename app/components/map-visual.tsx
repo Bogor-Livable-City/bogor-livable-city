@@ -303,3 +303,47 @@ export function ScoreLegend({
     </div>
   );
 }
+
+// Seluruh path hanya memakai perintah M, L, dan Z dengan koordinat absolut,
+// jadi kotak batasnya cukup dihitung dari pasangan angka di dalam d.
+function kotakBatas(d: string) {
+  const angka = (d.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+  const x = angka.filter((_, i) => i % 2 === 0);
+  const y = angka.filter((_, i) => i % 2 === 1);
+  const x0 = Math.min(...x);
+  const y0 = Math.min(...y);
+  return { x0, y0, lebar: Math.max(...x) - x0, tinggi: Math.max(...y) - y0 };
+}
+
+export function PetaKelurahan({ slug }: { slug: string }) {
+  const item = bogorSvgPaths.find((p) => p.slug === slug);
+  if (!item) return null;
+
+  const b = kotakBatas(item.d);
+  // Kotak pandang dibuat bujur sangkar supaya bentuk wilayahnya tidak gepeng.
+  const sisi = Math.max(b.lebar, b.tinggi) * 1.28;
+  const vb = [
+    b.x0 + b.lebar / 2 - sisi / 2,
+    b.y0 + b.tinggi / 2 - sisi / 2,
+    sisi,
+    sisi,
+  ].join(" ");
+
+  return (
+    <svg
+      className="peta-kelurahan"
+      viewBox={vb}
+      role="img"
+      aria-label={`Bentuk wilayah Kelurahan ${item.name}`}
+    >
+      <path
+        d={item.d}
+        fill={scoreToColor(getDimensionScore(slug, "livable"))}
+        stroke="#0b3f39"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}

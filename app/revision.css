@@ -1603,8 +1603,10 @@ html[data-splash="done"] .rb-site-stage {
 /* Monografi dan fun fact pada halaman detail kelurahan. */
 .monografi {
   display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(3, auto);
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 32px;
+  gap: 0 40px;
   margin: 0;
 }
 .monografi > div {
@@ -1629,22 +1631,19 @@ html[data-splash="done"] .rb-site-stage {
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 .fun-fact li {
   position: relative;
-  padding: 13px 16px 13px 44px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fffefa;
+  padding: 2px 0 2px 36px;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 .fun-fact li::before {
   content: counter(list-item);
   position: absolute;
-  left: 14px;
-  top: 12px;
+  left: 0;
+  top: 2px;
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -1729,9 +1728,6 @@ html[data-splash="done"] .rb-site-stage {
 
 /* Tabel indikator di halaman detail memakai tata letak yang sama dengan
    tabel perbandingan: label dan satuan di kiri, angka serif di tengah. */
-.indikator-table {
-  margin-top: 0;
-}
 .indikator-kepala {
   display: grid;
   grid-template-columns: 1.7fr 1fr 0.5fr 1fr;
@@ -1754,4 +1750,69 @@ html[data-splash="done"] .rb-site-stage {
 .indikator-table > .section-heading {
   display: block;
   margin-bottom: 18px;
+}
+
+/* ---- Halaman detail wilayah: jarak antar bagian dan gaya judul ---- */
+
+/* Jarak antar bagian disamakan. Sebelumnya 85 sampai 90px, sementara
+   monografi ke rincian indikator tidak berjarak sama sekali. */
+.detail-page .detail-section,
+.detail-page .detail-cta {
+  margin-top: 64px;
+}
+.detail-page .detail-stats {
+  margin: 28px 0 0;
+}
+.detail-page .section-heading {
+  margin-bottom: 22px;
+}
+
+/* Judul rincian indikator mengikuti judul monografi; .compare-table h2
+   mengecilkannya ke 25px. */
+.indikator-table .section-heading h2 {
+  font-size: 42px;
+}
+
+/* Peta hero menampilkan satu kelurahan, bukan seluruh kota, jadi bingkai
+   lingkarannya diganti kotak membulat. */
+.detail-map {
+  height: 230px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: #eef3ec;
+}
+.peta-kelurahan {
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+  overflow: visible;
+}
+
+.detail-kecamatan {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  margin: 6px 0 14px;
+}
+
+/* Isi kartu ajakan perbandingan dirata-tengahkan terhadap kartunya. */
+.detail-cta {
+  gap: 28px;
+}
+.detail-cta > div {
+  display: grid;
+  gap: 8px;
+}
+.detail-cta .button {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* Jarak komposit berisi tiga angka berlabel, terlalu panjang untuk ukuran
+   serif kolom nilai. */
+.indikator-table .nilai-komposit {
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
 }

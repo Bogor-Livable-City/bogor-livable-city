@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 
-import { BogorMap } from "../../components/map-visual";
+import { PetaKelurahan } from "../../components/map-visual";
 import { Icon, PageShell } from "../../components/ui";
 import {
   dimensions,
@@ -24,16 +24,10 @@ export function generateStaticParams() {
 function RegionLoading() {
   return (
     <PageShell className="detail-page">
-      <div className="breadcrumb">
-        <Link href="/peta">Peta</Link>
-        <Icon name="chevron" size={14} />
-        <span>Memuat wilayah...</span>
-      </div>
-
       <section className="detail-hero">
         <div>
-          <p className="eyebrow">Kelurahan · Kota Bogor</p>
           <h1>Memuat wilayah...</h1>
+          <p className="detail-kecamatan">Kota Bogor</p>
           <p>Sedang menyiapkan informasi kelayakhunian wilayah.</p>
         </div>
       </section>
@@ -115,21 +109,13 @@ async function RegionContent({
 
   return (
     <PageShell className="detail-page">
-      <div className="breadcrumb">
-        <Link href="/peta">Peta</Link>
-        <Icon name="chevron" size={14} />
-        <span>{district}</span>
-        <Icon name="chevron" size={14} />
-        <b>{name}</b>
-      </div>
-
       <section className="detail-hero">
         <div>
-          <p className="eyebrow">Kelurahan · {district}</p>
           <h1>{name}</h1>
+          <p className="detail-kecamatan">{district}</p>
           <p>
             Informasi indeks kelayakhunian wilayah berdasarkan enam dimensi
-            penilaian Kota Bogor (Kode Wilayah {region.kode}).
+            penilaian Kota Bogor.
           </p>
 
           <div className="detail-actions">
@@ -156,7 +142,7 @@ async function RegionContent({
         </div>
 
         <div className="detail-map">
-          <BogorMap compact selectedSlug={slugify(name)} />
+          <PetaKelurahan slug={slugify(name)} />
         </div>
       </section>
 
@@ -262,7 +248,9 @@ async function RegionContent({
                   {b.dimensi} · {b.satuan}
                 </small>
               </strong>
-              <span>{b.teksNilai ?? fmt(b.nilai as number, b.desimal)}</span>
+              <span className={b.teksNilai ? "nilai-komposit" : ""}>
+                {b.teksNilai ?? fmt(b.nilai as number, b.desimal)}
+              </span>
               <i className={bagus ? "" : "lower-good"}>
                 {selisih === null
                   ? "—"
