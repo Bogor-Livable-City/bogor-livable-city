@@ -2264,3 +2264,11 @@ html[data-splash="done"] .rb-site-stage {
 .map-3d-wrap > canvas {
   display: block;
 }
+
+/* Jawaban Tanya Bogor kini berisi daftar berbaris, jadi barisnya dipertahankan. */
+.message > div {
+  white-space: pre-line;
+}
+.message > div small {
+  white-space: normal;
+}

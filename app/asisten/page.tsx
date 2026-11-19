@@ -6,14 +6,20 @@ import { Header, Icon } from "../components/ui";
 import { districts } from "../data";
 import { kelurahanData } from "../kelurahan-data";
 import { scoreToClass } from "../lib/livability";
+import {
+  butuhLokasi,
+  jawabLokasi,
+  muatDataTanya,
+  type DataTanya,
+} from "../lib/tanya-bogor";
 
 type Message = { role: "user" | "bot"; text: string };
 
 const examples = [
-  "Kelurahan mana yang peringkat #1 dan apa keunggulannya?",
-  "Di mana kelurahan yang paling jauh dari Puskesmas (blank spot)?",
+  "Rumah sakit terdekat dari lokasi saya",
+  "Berapa jarak dari Bantarjati ke RS Hermina Bogor?",
+  "Di Bantarjati ada apa saja?",
   "Bandingkan Pabaton dengan Bantarjati.",
-  "Kelurahan mana yang ruang terbuka hijaunya (lingkungan) tertinggi?",
 ];
 
 function generateAnswer(query: string): string {
@@ -135,24 +141,14 @@ function generateAnswer(query: string): string {
       .replace(".", ",")} (${lowKec.villages} kelurahan) dan menjadi prioritas pemerataan infrastruktur.`;
   }
 
-  const top1 = kelurahanData[0];
-  const top2 = kelurahanData[1];
-  const top3 = kelurahanData[2];
-  return `Berdasarkan Geodatabase Ruang Bogor (68 kelurahan), peringkat #1 adalah ${
-    top1.kelurahan
-  } (${top1.kecamatan}) dengan skor ${top1.skor_livable
-    .toFixed(2)
-    .replace(".", ",")} (Pendidikan ${top1.skor_pendidikan
-    .toFixed(2)
-    .replace(".", ",")}; Transportasi ${top1.skor_transportasi
-    .toFixed(2)
-    .replace(".", ",")}; Kesehatan ${top1.skor_kesehatan
-    .toFixed(2)
-    .replace(".", ",")}), disusul #2 ${top2.kelurahan} (${top2.skor_livable
-    .toFixed(2)
-    .replace(".", ",")}) dan #3 ${top3.kelurahan} (${top3.skor_livable
-    .toFixed(2)
-    .replace(".", ",")}). Anda dapat menyebutkan nama kelurahan mana pun di Kota Bogor untuk melihat rincian indikatornya.`;
+  return `Saya menjawab dari data Ruang Bogor sendiri: 68 kelurahan, 119 fasilitas kesehatan, dan 553 sekolah. Di luar itu saya belum bisa, misalnya tempat makan, pusat belanja, atau sejarah kota.
+
+Yang bisa saya jawab:
+• "Rumah sakit terdekat dari Cibuluh" atau "dari lokasi saya"
+• "Berapa jarak dari Bantarjati ke RS Hermina Bogor"
+• "Di Bantarjati ada apa saja"
+• "Kelurahan mana yang peringkat #1"
+• "Bandingkan Pabaton dengan Bantarjati"`;
 }
 
 function AssistantWorkspace() {
@@ -163,15 +159,50 @@ function AssistantWorkspace() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
 
-  const ask = (text: string) => {
+  const [data, setData] = useState<DataTanya | null>(null);
+  const [posisi, setPosisi] = useState<[number, number] | null>(null);
+  // Pertanyaan dari parameter ?q= bisa jalan sebelum geojson selesai dimuat,
+  // jadi janjinya disimpan dan ditunggu di dalam ask().
+  const muatRef = useRef<Promise<DataTanya | null> | null>(null);
+
+  useEffect(() => {
+    muatRef.current = muatDataTanya()
+      .then((d) => {
+        setData(d);
+        return d;
+      })
+      .catch(() => null);
+  }, []);
+
+  const mintaPosisi = () =>
+    new Promise<[number, number] | null>((resolve) => {
+      if (!navigator.geolocation) return resolve(null);
+      navigator.geolocation.getCurrentPosition(
+        (p) => resolve([p.coords.longitude, p.coords.latitude]),
+        () => resolve(null),
+        { timeout: 8000 }
+      );
+    });
+
+  const ask = async (text: string) => {
     if (!text.trim()) return;
-    const reply = generateAnswer(text);
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", text },
-      { role: "bot", text: reply },
-    ]);
     setInput("");
+    setMessages((prev) => [...prev, { role: "user", text }]);
+
+    const siap = data ?? (await muatRef.current) ?? null;
+
+    let pos = posisi;
+    if (butuhLokasi(text) && !pos) {
+      pos = await mintaPosisi();
+      if (pos) setPosisi(pos);
+    }
+
+    const reply =
+      butuhLokasi(text) && !pos
+        ? "Saya tidak bisa membaca posisi Anda. Izinkan akses lokasi di peramban, atau sebutkan nama kelurahan sebagai titik awal, misalnya \"rumah sakit terdekat dari Cibuluh\"."
+        : (siap && jawabLokasi(text, siap, pos)) || generateAnswer(text);
+
+    setMessages((prev) => [...prev, { role: "bot", text: reply }]);
   };
 
   useEffect(() => {
