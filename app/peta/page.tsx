@@ -64,6 +64,7 @@ const OVERLAY_GROUPS: {
 
 export default function MapPage() {
   const [panel, setPanel] = useState<"layers" | "filters">("layers");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"2d" | "3d">("2d");
   const [theme, setTheme] = useState<ThemeKey>("skor_livable");
   const [basemap, setBasemap] = useState<Basemap>("light");
@@ -108,6 +109,7 @@ export default function MapPage() {
   const [filterKelurahan, setFilterKelurahan] = useState("Semua kelurahan");
   const [filterKelas, setFilterKelas] = useState("Semua klasifikasi");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
   const loadGeoData = useCallback(() => {
     setGeoLoading(true);
@@ -156,7 +158,13 @@ export default function MapPage() {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        const mobileLandscape = window.matchMedia(
+          "(max-width: 1000px) and (max-height: 600px) and (orientation: landscape)"
+        ).matches;
+        (mobileLandscape
+          ? mobileSearchInputRef.current
+          : searchInputRef.current
+        )?.focus();
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -254,7 +262,79 @@ export default function MapPage() {
     <div className="map-page">
       <Header />
       <main className="map-workspace">
-        <aside className="map-sidebar" aria-label="Kontrol peta dan filter">
+        <div className="map-mobile-tools">
+          <button
+            type="button"
+            className="map-sidebar-toggle"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Buka layer dan filter"
+            aria-expanded={sidebarOpen}
+            aria-controls="map-control-drawer"
+          >
+            <Icon name="menu" />
+          </button>
+          <div className="map-mobile-search-wrap">
+            <div className="map-mobile-search">
+              <Icon name="search" />
+              <input
+                ref={mobileSearchInputRef}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Cari kecamatan atau kelurahan"
+                placeholder="Cari Kelurahan / Kecamatan"
+              />
+            </div>
+            {searchQuery.trim().length > 0 && (
+              <div className="search-results" role="region" aria-label="Hasil pencarian">
+                {searchMatches.length > 0 ? (
+                  searchMatches.map((m) => (
+                    <button
+                      key={m.kode}
+                      type="button"
+                      onClick={() => {
+                        setSelectedKode(m.kode);
+                        setSearchQuery("");
+                      }}
+                    >
+                      <div>
+                        <b>{m.kelurahan}</b>
+                        <small>
+                          {m.kecamatan} · #{m.peringkat}
+                        </small>
+                      </div>
+                      <strong>{fmt(m[theme])}</strong>
+                    </button>
+                  ))
+                ) : (
+                  <div className="search-empty">
+                    Tidak ada kelurahan yang cocok dengan &ldquo;{searchQuery}&rdquo;.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className={`map-sidebar-backdrop ${sidebarOpen ? "visible" : ""}`}
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Tutup layer dan filter"
+        />
+
+        <aside
+          id="map-control-drawer"
+          className={`map-sidebar ${sidebarOpen ? "mobile-open" : ""}`}
+          aria-label="Kontrol peta dan filter"
+        >
+          <button
+            type="button"
+            className="map-sidebar-close"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Tutup layer dan filter"
+          >
+            <Icon name="close" />
+          </button>
           <div className="map-search">
             <Icon name="search" />
             <input
@@ -678,6 +758,19 @@ export default function MapPage() {
           </aside>
         )}
       </main>
+
+      <div
+        className="map-portrait-lock"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rotate-device-title"
+      >
+        <div>
+          <span className="rotate-device-icon" aria-hidden="true">↻</span>
+          <h1 id="rotate-device-title">Tolong rotate device</h1>
+          <p>Halaman peta tersedia dalam orientasi horizontal.</p>
+        </div>
+      </div>
     </div>
   );
 }
