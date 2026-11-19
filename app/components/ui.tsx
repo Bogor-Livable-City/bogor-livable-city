@@ -174,7 +174,7 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
 export function BrandMark({ className = "" }: { className?: string }) {
   return (
     <span className={`brand-mark ${className}`.trim()} aria-hidden="true">
-      <img src="/icon.svg" alt="" width="32" height="32" />
+      <img src="/logo.png" alt="" width="32" height="32" />
     </span>
   );
 }
