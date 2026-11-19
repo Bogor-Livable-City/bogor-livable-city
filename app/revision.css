@@ -1,6 +1,6 @@
 /* Revised landing composition & editorial motion system — Ruang Bogor */
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .landing-wash {
