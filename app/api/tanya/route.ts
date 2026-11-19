@@ -93,10 +93,16 @@ export async function POST(request: Request) {
     );
 
     if (!res.ok) {
-      // Isi galat dari Google bisa memuat potongan permintaan, jadi tidak diteruskan.
-      console.error("Gemini menolak permintaan:", res.status, await res.text());
+      const mentah = await res.text();
+      console.error("Gemini menolak permintaan:", res.status, mentah);
+      // Pesan galat Google menyebut sebabnya (kunci salah, model tidak ada,
+      // kuota habis) dan tidak memuat kuncinya, jadi aman diteruskan.
+      let sebab = `HTTP ${res.status}`;
+      try {
+        sebab = JSON.parse(mentah)?.error?.message ?? sebab;
+      } catch {}
       return NextResponse.json(
-        { jawaban: "Asisten pintar sedang tidak bisa dihubungi. Coba lagi sebentar lagi." },
+        { jawaban: `Asisten pintar sedang tidak bisa dihubungi. Sebabnya: ${sebab}` },
         { status: 502 }
       );
     }
