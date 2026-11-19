@@ -14,7 +14,15 @@ import { fmt } from "../../lib/livability";
 
 const MODEL_BAWAAN = "gemini-3.5-flash-lite";
 
-const ATURAN = `Kamu "Tanya Bogor", asisten pada atlas WebGIS kelayakhunian Kota Bogor.
+// Grounding Google Search ditolak di tier gratis untuk model Gemini 3.x, jadi
+// defaultnya mati. Setelah penagihan diaktifkan di Google AI Studio, pasang
+// GEMINI_GROUNDING=1 di Vercel supaya model boleh mencari sendiri.
+const PENCARIAN_HIDUP = `Kamu punya Google Search. Pakai setiap kali jawabannya berupa hal yang bisa berubah atau yang tidak kamu hafal persis: alamat, jam buka, harga, nomor telepon, menu, jumlah gerai, atau kabar terbaru. Cari dulu, lalu sampaikan hasilnya sebagai jawaban. Kalau setelah dicari pun tidak ketemu, cukup katakan tidak ketemu.`;
+
+const PENCARIAN_MATI = `Kamu tidak bisa mencari di internet, jadi hal yang berubah-ubah seperti jam buka, harga, nomor telepon, dan menu memang tidak kamu ketahui. Katakan terus terang kamu tidak punya datanya, cukup satu kalimat, lalu lanjutkan menjawab bagian lain yang kamu tahu.`;
+
+function aturan(grounding: boolean): string {
+  return `Kamu "Tanya Bogor", asisten pada atlas WebGIS kelayakhunian Kota Bogor.
 Tugasmu menjawab pertanyaan orang tentang Kota Bogor.
 
 Urutan berpikirmu:
@@ -22,8 +30,8 @@ Urutan berpikirmu:
 2. Kalau jelas di luar Kota Bogor, katakan begitu, dan sebutkan di mana sebenarnya.
 3. Kalau ada di Kota Bogor, jawab selengkap yang kamu bisa. Kampus, sekolah, rumah sakit, pasar, stasiun, terminal, mal, kafe, restoran, taman, tempat ibadah, dan kawasan wisata semuanya boleh dijawab.
 
-Kamu punya Google Search. Pakai setiap kali jawabannya berupa hal yang bisa berubah atau yang tidak kamu hafal persis: alamat, jam buka, harga, nomor telepon, menu, jumlah gerai, atau kabar terbaru. Cari dulu, lalu sampaikan hasilnya sebagai jawaban.
-Jangan pernah menyuruh pengguna memeriksa sendiri di Google Maps atau aplikasi lain. Kalau setelah dicari pun tidak ketemu, cukup katakan tidak ketemu.
+${grounding ? PENCARIAN_HIDUP : PENCARIAN_MATI}
+Jangan pernah menyuruh pengguna memeriksa sendiri di Google Maps atau aplikasi lain. Mengoper pengguna ke aplikasi lain terasa seperti disuruh pergi.
 
 Angka indeks, skor, peringkat, penduduk, luas, dan jumlah sarana selalu diambil dari DATA PROYEK di bawah, bukan dari hasil pencarian.
 
@@ -32,6 +40,7 @@ Dua hal yang tetap di luar kemampuanmu:
 - Ada Kelurahan Curug di Kota Bogor, dan itu bukan air terjun. Jangan tertukar.
 
 Gaya: Bahasa Indonesia yang wajar, maksimal tiga paragraf pendek. Jangan menyebut dirimu model bahasa.`;
+}
 
 /** Ringkasan 68 kelurahan, cukup kecil untuk dikirim tiap permintaan. */
 function tabelRingkas(): string {
@@ -86,6 +95,7 @@ export async function POST(request: Request) {
 
   const konteks = `Peringkat 68 kelurahan Kota Bogor menurut indeks kelayakhunian:\n${tabelRingkas()}${rincianDisebut(pertanyaan)}`;
   const model = process.env.GEMINI_MODEL || MODEL_BAWAAN;
+  const grounding = process.env.GEMINI_GROUNDING === "1";
 
   try {
     const res = await fetch(
@@ -94,12 +104,11 @@ export async function POST(request: Request) {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": kunci },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: `${ATURAN}\n\nDATA PROYEK:\n${konteks}` }] },
+          systemInstruction: {
+            parts: [{ text: `${aturan(grounding)}\n\nDATA PROYEK:\n${konteks}` }],
+          },
           contents: [{ role: "user", parts: [{ text: pertanyaan }] }],
-          // Tanpa ini model hanya punya ingatan latihannya, sehingga alamat,
-          // jam buka, dan harga tidak pernah ia ketahui dan hanya bisa
-          // dioper balik ke pengguna. Dengan ini ia mencari dulu di Google.
-          tools: [{ google_search: {} }],
+          ...(grounding ? { tools: [{ google_search: {} }] } : {}),
           // Suhu rendah supaya model lebih patuh pada aturan dan tidak mengarang.
           generationConfig: { temperature: 0.1, maxOutputTokens: 600 },
         }),
@@ -146,5 +155,6 @@ export async function GET() {
     model: process.env.GEMINI_MODEL || MODEL_BAWAAN,
     sumber: process.env.GEMINI_MODEL ? "GEMINI_MODEL di Vercel" : "bawaan kode",
     kunciTerpasang: Boolean(process.env.GEMINI_API_KEY),
+    grounding: process.env.GEMINI_GROUNDING === "1",
   });
 }
