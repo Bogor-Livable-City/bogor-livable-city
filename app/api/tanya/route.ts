@@ -6,13 +6,13 @@
 //
 // Butuh dua environment variable di Vercel:
 //   GEMINI_API_KEY  wajib, dari https://aistudio.google.com/apikey
-//   GEMINI_MODEL    opsional, bawaannya gemini-4-hydrogen
+//   GEMINI_MODEL    opsional, bawaannya gemini-3.5-flash-lite
 
 import { NextResponse } from "next/server";
 import { kelurahanData } from "../../kelurahan-data";
 import { fmt } from "../../lib/livability";
 
-const MODEL_BAWAAN = "gemini-4-hydrogen";
+const MODEL_BAWAAN = "gemini-3.5-flash-lite";
 
 const ATURAN = `Kamu "Tanya Bogor", asisten pada atlas WebGIS kelayakhunian Kota Bogor.
 
