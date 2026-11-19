@@ -6,7 +6,7 @@ import { citySummary } from "../data";
 import { kelurahanData } from "../kelurahan-data";
 import { scoreToClass, scoreToColor, toSlug } from "../lib/livability";
 import { BogorMap, type MapDimensionKey } from "./map-visual";
-import { Icon } from "./ui";
+import { BrandMark, Icon } from "./ui";
 
 const previewDimensions: { key: MapDimensionKey; label: string }[] = [
   { key: "livable", label: "Indeks Total" },
@@ -52,9 +52,7 @@ export function HeroInteractivePreview() {
     <div className="hero-app-preview">
       <div className="preview-bar">
         <span>
-          <i aria-hidden="true" />
-          <i aria-hidden="true" />
-          <i aria-hidden="true" />
+          <BrandMark className="preview-brand-mark" />
           ruang<b>bogor</b>
         </span>
         <nav aria-label="Pilih dimensi pratinjau" className="preview-dim-pills">

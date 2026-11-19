@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BrandMark } from "./ui";
 
 export function SplashLoader() {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -82,7 +83,10 @@ export function SplashLoader() {
             ATLAS GEOSPASIAL KOTA BOGOR · WGS 84
           </div>
 
-          <p className="rb-splash-title">RUANG BOGOR</p>
+          <p className="rb-splash-title">
+            <BrandMark className="rb-splash-brand-mark" />
+            <span>RUANG BOGOR</span>
+          </p>
 
           <div className="rb-splash-line" aria-hidden="true" />
 

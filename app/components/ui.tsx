@@ -171,6 +171,14 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
   );
 }
 
+export function BrandMark({ className = "" }: { className?: string }) {
+  return (
+    <span className={`brand-mark ${className}`.trim()} aria-hidden="true">
+      <img src="/icon.svg" alt="" width="32" height="32" />
+    </span>
+  );
+}
+
 export function Logo({ light = false }: { light?: boolean }) {
   return (
     <Link
@@ -178,11 +186,7 @@ export function Logo({ light = false }: { light?: boolean }) {
       className={`logo ${light ? "logo-light" : ""}`}
       aria-label="Ruang Bogor, kembali ke beranda"
     >
-      <span className="logo-mark" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-      </span>
+      <BrandMark className="logo-mark" />
       <span>
         ruang<b>bogor</b>
       </span>
