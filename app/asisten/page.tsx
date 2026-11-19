@@ -151,6 +151,20 @@ Yang bisa saya jawab:
 • "Bandingkan Pabaton dengan Bantarjati"`;
 }
 
+async function tanyaGemini(pertanyaan: string): Promise<string | null> {
+  try {
+    const res = await fetch("/api/tanya", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pertanyaan }),
+    });
+    const data = await res.json();
+    return res.ok && typeof data?.jawaban === "string" ? data.jawaban : null;
+  } catch {
+    return null;
+  }
+}
+
 function AssistantWorkspace() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q");
@@ -160,6 +174,7 @@ function AssistantWorkspace() {
   const [input, setInput] = useState("");
 
   const [data, setData] = useState<DataTanya | null>(null);
+  const [menunggu, setMenunggu] = useState(false);
   const [posisi, setPosisi] = useState<[number, number] | null>(null);
   // Pertanyaan dari parameter ?q= bisa jalan sebelum geojson selesai dimuat,
   // jadi janjinya disimpan dan ditunggu di dalam ask().
@@ -197,11 +212,21 @@ function AssistantWorkspace() {
       if (pos) setPosisi(pos);
     }
 
-    const reply =
+    // Pertanyaan yang ada datanya dijawab lokal supaya angkanya pasti; model
+    // bahasa tidak bisa menghitung jarak dan akan mengarang angkanya.
+    const lokal =
       butuhLokasi(text) && !pos
         ? "Saya tidak bisa membaca posisi Anda. Izinkan akses lokasi di peramban, atau sebutkan nama kelurahan sebagai titik awal, misalnya \"rumah sakit terdekat dari Cibuluh\"."
-        : (siap && jawabLokasi(text, siap, pos)) || generateAnswer(text);
+        : siap && jawabLokasi(text, siap, pos);
 
+    if (lokal) {
+      setMessages((prev) => [...prev, { role: "bot", text: lokal }]);
+      return;
+    }
+
+    setMenunggu(true);
+    const reply = (await tanyaGemini(text)) ?? generateAnswer(text);
+    setMenunggu(false);
     setMessages((prev) => [...prev, { role: "bot", text: reply }]);
   };
 
@@ -294,6 +319,14 @@ function AssistantWorkspace() {
                 </div>
               </div>
             ))}
+            {menunggu && (
+              <div className="message bot" aria-live="polite">
+                <span aria-hidden="true">
+                  <Icon name="map" size={16} />
+                </span>
+                <div>Sedang mencari jawabannya...</div>
+              </div>
+            )}
           </div>
         )}
 

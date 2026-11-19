@@ -139,25 +139,6 @@ function cariAsal(
   return null;
 }
 
-// Hal-hal tentang Kota Bogor yang sering ditanyakan tetapi tidak ada datanya
-// di proyek ini. Lebih baik dijawab terus terang daripada dibelokkan.
-const DI_LUAR_DATA: [RegExp, string][] = [
-  [/(tempat makan|restoran|kuliner|cafe|kafe|warung|kopi)/, "tempat makan"],
-  [/(mall|mal |pusat belanja|belanja|pasar|toko)/, "pusat belanja dan pasar"],
-  [/(wisata|rekreasi|kebun raya|taman|museum|hotel|penginapan)/, "tempat wisata dan penginapan"],
-  [/(atm|bank |kantor pos|spbu|pom bensin)/, "ATM, bank, dan SPBU"],
-  [/(masjid|gereja|vihara|pura|klenteng)/, "rumah ibadah"],
-  [/(sejarah|budaya|asal usul|kenapa disebut)/, "sejarah dan budaya"],
-  [/(macet|lalu lintas|angkot|transportasi umum|kereta|stasiun|terminal)/, "transportasi umum dan lalu lintas"],
-  [/(cuaca|hujan|suhu|banjir)/, "cuaca"],
-];
-
-export function diLuarData(q: string): string | null {
-  const qn = ` ${normal(q)} `;
-  for (const [pola, nama] of DI_LUAR_DATA) if (pola.test(qn)) return nama;
-  return null;
-}
-
 const CATATAN_GARIS_LURUS =
   "Jarak ini diukur garis lurus, bukan menurut jalan, jadi jarak tempuh sebenarnya akan lebih panjang.";
 
@@ -168,12 +149,6 @@ export function jawabLokasi(
 ): string | null {
   const qn = normal(q);
 
-  const luar = diLuarData(q);
-  if (luar) {
-    return `Saya belum punya data ${luar} di Kota Bogor, jadi tidak bisa menjawabnya. Basis data proyek ini hanya memuat batas 68 kelurahan, 119 fasilitas kesehatan, dan 553 sekolah.
-
-Yang bisa saya jawab seputar itu, misalnya "rumah sakit terdekat dari lokasi saya", "berapa jarak dari Bantarjati ke RS Azra", atau "di Bantarjati ada apa saja".`;
-  }
 
   // 1. "Di kelurahan X ada apa saja"
   if (/(ada apa|apa saja|apa aja|fasilitas apa|daftar fasilitas)/.test(qn)) {
