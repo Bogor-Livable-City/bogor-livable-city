@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { SplashLoader } from "./components/splash-loader";
 import "./globals.css";
 import "./inner.css";
 import "./admin.css";
@@ -14,10 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="id" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
-        <SplashLoader />
-        <div className="rb-site-stage">{children}</div>
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
