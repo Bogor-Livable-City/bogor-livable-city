@@ -146,18 +146,13 @@ export function Logo({ light = false }: { light?: boolean }) {
       className={`logo ${light ? "logo-light" : ""}`}
       aria-label="Ruang Bogor, kembali ke beranda"
     >
-      <svg
-        className="logo-mark"
-        aria-hidden="true"
-        viewBox="0 0 30 24"
-        fill="none"
-      >
-        <path d="M3 20 9 4h4L7 20H3Z" fill="currentColor" />
-        <path d="m11 20 6-16h4l-6 16h-4Z" fill="currentColor" />
-        <path d="m19 20 6-16h4l-6 16h-4Z" fill="currentColor" />
-      </svg>
+      <span className="logo-mark" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
       <span>
-        ruang <b>bogor</b>
+        ruang<b>bogor</b>
       </span>
     </Link>
   );

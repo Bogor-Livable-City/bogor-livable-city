@@ -23,7 +23,9 @@ h1,h2,h3,h4,p{margin:0}
 .logo{display:inline-flex;align-items:center;gap:9px;color:var(--ink);font-size:18px;letter-spacing:-.04em}
 .logo b{font-weight:750}
 .logo-light{color:white}
-.logo-mark{display:block;width:30px;height:24px;flex:0 0 auto}
+.logo-mark{position:relative;display:block;width:23px;height:23px}
+.logo-mark i{position:absolute;bottom:2px;width:6px;background:currentColor;border-radius:4px 4px 1px 1px;transform:rotate(-15deg)}
+.logo-mark i:nth-child(1){left:2px;height:15px}.logo-mark i:nth-child(2){left:9px;height:20px}.logo-mark i:nth-child(3){left:16px;height:11px}
 .site-header{height:74px;border-bottom:1px solid rgba(23,59,56,.09);background:rgba(247,246,240,.92);backdrop-filter:blur(16px);position:relative;z-index:50}
 .header-inner{max-width:1240px;height:100%;margin:auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between}
 .main-nav{display:flex;height:100%;align-items:center;gap:28px}
