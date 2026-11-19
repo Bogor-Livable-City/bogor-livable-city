@@ -114,6 +114,12 @@ export function cariTitik(q: string, titik: Titik[]): Titik | null {
   return nilaiTerbaik >= 1 ? terbaik : null;
 }
 
+// Nama kelurahan sering dipakai juga sebagai nama tempat lain: ada Kelurahan
+// Pakuan dan ada Universitas Pakuan. Kalau pertanyaannya menyebut jenis tempat
+// dari daftar ini, yang dicari bukan kelurahannya.
+const PENANDA_TEMPAT =
+  /\b(universitas|univ|kampus|institut|politeknik|akademi|pesantren|sekolah|sd|sdn|smp|smpn|sma|smk|smkn|mts|man|rs|rsu|rsud|rumah sakit|puskesmas|klinik|apotek|pasar|mal|mall|plaza|stasiun|terminal|bandara|hotel|masjid|gereja|pura|vihara|taman|kebun|lapangan|museum|tugu|restoran|resto|kafe|cafe|warung|rumah makan|toko|bank|kantor|hotel|villa|kolam)\b/;
+
 function cariKelurahan(q: string) {
   const qn = normal(q);
   return kelurahanData.find((k) => qn.includes(normal(k.kelurahan))) ?? null;
@@ -187,7 +193,7 @@ export function jawabLokasi(
     if (t) {
       return `${t.nama} (${LABEL_JENIS[t.jenis] ?? t.jenis}) ada di Kelurahan ${t.kelurahan}, Kecamatan ${t.kecamatan}. Koordinatnya ${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}. Anda bisa membukanya lewat halaman peta dengan memilih Kelurahan ${t.kelurahan}.`;
     }
-    const kel = cariKelurahan(q);
+    const kel = PENANDA_TEMPAT.test(qn) ? null : cariKelurahan(q);
     if (kel) {
       return `Kelurahan ${kel.kelurahan} ada di Kecamatan ${kel.kecamatan}, Kota Bogor. Luasnya ${fmt(kel.luas_km2)} km² dengan ${kel.penduduk.toLocaleString("id-ID")} jiwa penduduk, dan indeks kelayakhuniannya ${fmt(kel.skor_livable)} (peringkat #${kel.peringkat} dari 68).`;
     }
