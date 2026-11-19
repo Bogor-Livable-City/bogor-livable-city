@@ -65,15 +65,7 @@ export function HeroInteractivePreview() {
               className={dimension === d.key ? "active" : ""}
               onClick={() => setDimension(d.key)}
             >
-              {d.key === "livable" ? (
-                <>
-                  Indeks
-                  <br />
-                  Total
-                </>
-              ) : (
-                d.label
-              )}
+              {d.label}
             </button>
           ))}
         </nav>
@@ -299,7 +291,10 @@ export function InteractiveDistrictRibbon({
       <div className="district-ribbon-copy">
         <div className="section-heading">
           <p className="eyebrow">Agregat 6 kecamatan</p>
-          <h2>Perbandingan skor antarkecamatan.</h2>
+          <h2>
+            <span>Perbandingan skor</span>{" "}
+            <span>antarkecamatan.</span>
+          </h2>
         </div>
         <p className="district-lead">
           Pilih batang kecamatan untuk melihat rata-rata indeks tertimbang

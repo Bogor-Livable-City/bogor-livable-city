@@ -94,7 +94,7 @@ export const citySummary = {
 export const dimensions = [
   {
     key: "skor_kesehatan" as const,
-    icon: "plus",
+    icon: "health",
     name: "Kesehatan",
     value: avg((k) => k.skor_kesehatan),
     note: `${fmt(avg((k) => k.cakupan_faskes_pct), 1)}% cakupan layanan faskes`,
@@ -105,7 +105,7 @@ export const dimensions = [
   },
   {
     key: "skor_pendidikan" as const,
-    icon: "chart",
+    icon: "education",
     name: "Pendidikan",
     value: avg((k) => k.skor_pendidikan),
     note: `${fmt(avg((k) => k.sekolah_per_10rb), 1)} sekolah / 10.000 jiwa`,
@@ -116,7 +116,7 @@ export const dimensions = [
   },
   {
     key: "skor_sosial" as const,
-    icon: "rank",
+    icon: "people",
     name: "Sosial kependudukan",
     value: avg((k) => k.skor_sosial),
     note: `${Math.round(avg((k) => k.kepadatan_jiwa_km2)).toLocaleString("id-ID")} jiwa/km² rata-rata`,
@@ -127,7 +127,7 @@ export const dimensions = [
   },
   {
     key: "skor_lingkungan" as const,
-    icon: "layers",
+    icon: "leaf",
     name: "Lingkungan",
     value: avg((k) => k.skor_lingkungan),
     note: `${fmt(avg((k) => k.vegetasi_pct), 1)}% tutupan vegetasi`,
@@ -138,7 +138,7 @@ export const dimensions = [
   },
   {
     key: "skor_transportasi" as const,
-    icon: "map",
+    icon: "transport",
     name: "Transportasi",
     value: avg((k) => k.skor_transportasi),
     note: `${fmt(avg((k) => k.kerapatan_jalan_km_km2), 1)} km/km² kerapatan jalan`,
@@ -149,7 +149,7 @@ export const dimensions = [
   },
   {
     key: "skor_ekonomi" as const,
-    icon: "sliders",
+    icon: "economy",
     name: "Ekonomi",
     value: avg((k) => k.skor_ekonomi),
     note: `${fmt(avg((k) => k.perdagangan_pct), 1)}% kawasan perdagangan`,

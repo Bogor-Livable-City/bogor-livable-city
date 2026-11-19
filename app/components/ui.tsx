@@ -78,6 +78,38 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
         <path d="M12 5v14M5 12h14" />
       </>
     ),
+    health: <path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z" />,
+    education: (
+      <>
+        <path d="m3 9 9-5 9 5-9 5-9-5Z" />
+        <path d="M7 12v4c3 2 7 2 10 0v-4M21 9v6" />
+      </>
+    ),
+    people: (
+      <>
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M17 14a5 5 0 0 1 4 5" />
+      </>
+    ),
+    leaf: (
+      <>
+        <path d="M20 4C11 4 5 9 5 16c0 2 1 4 3 5 7-2 11-7 12-17Z" />
+        <path d="M4 21c3-5 7-8 12-11" />
+      </>
+    ),
+    transport: (
+      <>
+        <path d="M5 17h14l-1-6-2-4H8l-2 4-1 6ZM3 13h18M7 17v2M17 17v2" />
+        <circle cx="8" cy="14" r="1" />
+        <circle cx="16" cy="14" r="1" />
+      </>
+    ),
+    economy: (
+      <>
+        <path d="M4 10h16v10H4ZM3 10l2-6h14l2 6M8 20v-6h5v6" />
+        <path d="M3 10c0 2 3 2 3 0 0 2 3 2 3 0 0 2 3 2 3 0 0 2 3 2 3 0 0 2 3 2 3 0" />
+      </>
+    ),
     edit: (
       <>
         <path d="m4 20 4.5-1 10-10-3.5-3.5-10 10L4 20Z" />
