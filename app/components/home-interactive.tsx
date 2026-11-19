@@ -292,8 +292,8 @@ export function InteractiveDistrictRibbon({
         <div className="section-heading">
           <p className="eyebrow">Agregat 6 kecamatan</p>
           <h2>
-            <span>Perbandingan skor</span>{" "}
-            <span>antarkecamatan.</span>
+            <span>Bandingkan skor</span>{" "}
+            <span>6 kecamatan.</span>
           </h2>
         </div>
         <p className="district-lead">
