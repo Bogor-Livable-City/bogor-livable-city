@@ -79,6 +79,14 @@ function kataPenting(teks: string): string[] {
     .filter((w) => (w.length >= 4 || /^\d+$/.test(w)) && !KATA_UMUM.has(w));
 }
 
+function cariJenis(q: string): string | null {
+  const qn = ` ${normal(q)} `;
+  for (const [jenis, kata] of KATA_JENIS) {
+    if (kata.some((w) => qn.includes(w))) return jenis;
+  }
+  return null;
+}
+
 /** Titik dengan nama yang paling cocok dengan kalimat pertanyaan. */
 export function cariTitik(q: string, titik: Titik[]): Titik | null {
   const qn = ` ${normal(q)} `;
@@ -91,6 +99,10 @@ export function cariTitik(q: string, titik: Titik[]): Titik | null {
     if (kata.length === 0) continue;
     const cocok = kata.filter((w) => qn.includes(` ${w} `)).length;
     if (cocok === 0) continue;
+    // Satu kata yang kebetulan sama tidak cukup. "univ pakuan" pernah dijawab
+    // dengan SD N PAKUAN hanya karena kata "pakuan" ada di keduanya. Jadi satu
+    // kata hanya diterima kalau jenis fasilitasnya ikut disebut di pertanyaan.
+    if (cocok < 2 && cariJenis(q) !== t.jenis) continue;
     // Nama yang seluruh katanya muncul di pertanyaan menang atas nama yang
     // cuma cocok sebagian, supaya "smkn 1" tidak jatuh ke SMKN 4.
     const nilai = cocok - 0.25 * (kata.length - cocok);
@@ -107,13 +119,6 @@ function cariKelurahan(q: string) {
   return kelurahanData.find((k) => qn.includes(normal(k.kelurahan))) ?? null;
 }
 
-function cariJenis(q: string): string | null {
-  const qn = ` ${normal(q)} `;
-  for (const [jenis, kata] of KATA_JENIS) {
-    if (kata.some((w) => qn.includes(w))) return jenis;
-  }
-  return null;
-}
 
 export function butuhLokasi(q: string): boolean {
   const qn = normal(q);
