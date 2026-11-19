@@ -56,10 +56,6 @@ export function HeroInteractivePreview() {
           <i aria-hidden="true" />
           <i aria-hidden="true" />
           ruang<b>bogor</b>
-          <em className="preview-live-badge">
-            <span className="live-dot" aria-hidden="true" />
-            Pratinjau 68 Kelurahan
-          </em>
         </span>
         <nav aria-label="Pilih dimensi pratinjau" className="preview-dim-pills">
           {previewDimensions.map((d) => (
@@ -69,7 +65,15 @@ export function HeroInteractivePreview() {
               className={dimension === d.key ? "active" : ""}
               onClick={() => setDimension(d.key)}
             >
-              {d.label}
+              {d.key === "livable" ? (
+                <>
+                  Indeks
+                  <br />
+                  Total
+                </>
+              ) : (
+                d.label
+              )}
             </button>
           ))}
         </nav>
