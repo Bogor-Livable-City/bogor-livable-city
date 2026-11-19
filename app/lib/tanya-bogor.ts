@@ -194,7 +194,7 @@ export function jawabLokasi(
   if (/(terdekat|paling dekat|terjauh)/.test(qn)) {
     const jenis = cariJenis(q);
     if (!asal) {
-      return "Saya perlu tahu titik awalnya. Sebutkan nama kelurahan, misalnya \"puskesmas terdekat dari Cibuluh\", atau tulis \"dari lokasi saya\" supaya saya pakai posisi Anda sekarang.";
+      return "Titik awalnya harus salah satu dari 68 kelurahan Kota Bogor, misalnya \"puskesmas terdekat dari Cibuluh\", atau tulis \"dari lokasi saya\". Kalau nama yang Anda sebut tidak saya kenali, kemungkinan itu bukan kelurahan di Kota Bogor, melainkan di Kabupaten Bogor yang di luar cakupan data ini.";
     }
     const kandidat = jenis
       ? data.titik.filter((t) => t.jenis === jenis)
@@ -217,7 +217,7 @@ export function jawabLokasi(
   const tujuan = cariTitik(q, data.titik);
   if (tujuan && /(jarak|jauh|berapa|menuju|ke )/.test(qn)) {
     if (!asal) {
-      return `${tujuan.nama} ada di Kelurahan ${tujuan.kelurahan}, Kecamatan ${tujuan.kecamatan}. Untuk menghitung jaraknya, sebutkan titik awalnya, misalnya "dari Bantarjati ke ${tujuan.nama}" atau "dari lokasi saya".`;
+      return `${tujuan.nama} ada di Kelurahan ${tujuan.kelurahan}, Kecamatan ${tujuan.kecamatan}. Untuk menghitung jaraknya, titik awalnya harus salah satu dari 68 kelurahan Kota Bogor, misalnya "dari Bantarjati ke ${tujuan.nama}", atau tulis "dari lokasi saya". Kalau nama yang Anda sebut tidak saya kenali, kemungkinan itu bukan kelurahan di Kota Bogor, melainkan di Kabupaten Bogor yang di luar cakupan data ini.`;
     }
     const d = jarakMeter(asal.koordinat, [tujuan.lon, tujuan.lat]);
     return `Dari ${asal.sebutan} ke ${tujuan.nama} (${LABEL_JENIS[tujuan.jenis] ?? tujuan.jenis}, Kelurahan ${tujuan.kelurahan}) berjarak sekitar ${tulisJarak(d)}.\n\n${CATATAN_GARIS_LURUS}`;

@@ -139,3 +139,13 @@ export async function POST(request: Request) {
     );
   }
 }
+
+// Supaya model yang sedang dipakai bisa dicek tanpa membuka kode atau
+// dasbor Vercel. Nama model bukan rahasia; kuncinya tidak pernah ikut.
+export async function GET() {
+  return NextResponse.json({
+    model: process.env.GEMINI_MODEL || MODEL_BAWAAN,
+    sumber: process.env.GEMINI_MODEL ? "GEMINI_MODEL di Vercel" : "bawaan kode",
+    kunciTerpasang: Boolean(process.env.GEMINI_API_KEY),
+  });
+}
