@@ -72,18 +72,30 @@ const KATA_UMUM = new Set([
   "sekolah", "kota", "bogor", "kelurahan", "kecamatan",
 ]);
 
+// Angka ikut dihitung, karena justru angka yang membedakan SMKN 1 dari SMKN 4.
+function kataPenting(teks: string): string[] {
+  return teks
+    .split(" ")
+    .filter((w) => (w.length >= 4 || /^\d+$/.test(w)) && !KATA_UMUM.has(w));
+}
+
 /** Titik dengan nama yang paling cocok dengan kalimat pertanyaan. */
 export function cariTitik(q: string, titik: Titik[]): Titik | null {
-  const qn = normal(q);
+  const qn = ` ${normal(q)} `;
   let terbaik: Titik | null = null;
   let nilaiTerbaik = 0;
   for (const t of titik) {
     const nn = normal(t.nama);
     if (qn.includes(nn)) return t;
-    const kata = nn.split(" ").filter((w) => w.length >= 4 && !KATA_UMUM.has(w));
-    const cocok = kata.filter((w) => qn.includes(w)).length;
-    if (cocok > nilaiTerbaik) {
-      nilaiTerbaik = cocok;
+    const kata = kataPenting(nn);
+    if (kata.length === 0) continue;
+    const cocok = kata.filter((w) => qn.includes(` ${w} `)).length;
+    if (cocok === 0) continue;
+    // Nama yang seluruh katanya muncul di pertanyaan menang atas nama yang
+    // cuma cocok sebagian, supaya "smkn 1" tidak jatuh ke SMKN 4.
+    const nilai = cocok - 0.25 * (kata.length - cocok);
+    if (nilai > nilaiTerbaik) {
+      nilaiTerbaik = nilai;
       terbaik = t;
     }
   }
@@ -185,9 +197,25 @@ Yang bisa saya jawab seputar itu, misalnya "rumah sakit terdekat dari lokasi say
     return `Di Kelurahan ${kel.kelurahan} (${kel.kecamatan}) terdata ${isi.length} fasilitas.\n\n${baris.join("\n")}\n\nPenduduknya ${kel.penduduk.toLocaleString("id-ID")} jiwa, luas ${fmt(kel.luas_km2)} km², indeks kelayakhunian ${fmt(kel.skor_livable)} (peringkat #${kel.peringkat}).`;
   }
 
+  // 2. "Di mana lokasi X". Pertanyaan jarak dikecualikan, karena kalimatnya
+  // sering juga memuat kata "lokasi", misalnya "terdekat dari lokasi saya".
+  if (
+    /(di ?mana|dimana|lokasi|alamat|letak|posisi)/.test(qn) &&
+    !/(terdekat|paling dekat|terjauh|jarak|berapa jauh)/.test(qn)
+  ) {
+    const t = cariTitik(q, data.titik);
+    if (t) {
+      return `${t.nama} (${LABEL_JENIS[t.jenis] ?? t.jenis}) ada di Kelurahan ${t.kelurahan}, Kecamatan ${t.kecamatan}. Koordinatnya ${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}. Anda bisa membukanya lewat halaman peta dengan memilih Kelurahan ${t.kelurahan}.`;
+    }
+    const kel = cariKelurahan(q);
+    if (kel) {
+      return `Kelurahan ${kel.kelurahan} ada di Kecamatan ${kel.kecamatan}, Kota Bogor. Luasnya ${fmt(kel.luas_km2)} km² dengan ${kel.penduduk.toLocaleString("id-ID")} jiwa penduduk, dan indeks kelayakhuniannya ${fmt(kel.skor_livable)} (peringkat #${kel.peringkat} dari 68).`;
+    }
+  }
+
   const asal = cariAsal(q, data, posisi);
 
-  // 2. "Rumah sakit terdekat dari X"
+  // 3. "Rumah sakit terdekat dari X"
   if (/(terdekat|paling dekat|terjauh)/.test(qn)) {
     const jenis = cariJenis(q);
     if (!asal) {
@@ -210,7 +238,7 @@ Yang bisa saya jawab seputar itu, misalnya "rumah sakit terdekat dari lokasi say
       .join("\n")}\n\n${CATATAN_GARIS_LURUS}`;
   }
 
-  // 3. "Berapa jarak dari X ke <nama fasilitas>"
+  // 4. "Berapa jarak dari X ke <nama fasilitas>"
   const tujuan = cariTitik(q, data.titik);
   if (tujuan && /(jarak|jauh|berapa|menuju|ke )/.test(qn)) {
     if (!asal) {
