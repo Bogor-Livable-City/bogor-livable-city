@@ -1911,6 +1911,173 @@ html[data-splash="done"] .rb-site-stage {
   }
 }
 
+/* Landing page: keep the product snapshot proportional on every viewport. */
+.landing-wash .hero {
+  min-height: 1050px;
+}
+
+.hero-app-preview {
+  width: min(960px, calc(100% - 64px));
+  height: auto;
+  aspect-ratio: 16 / 9;
+  bottom: -145px;
+}
+
+.preview-body {
+  height: calc(100% - 50px);
+}
+
+.landing-wash .city-strip {
+  height: auto;
+  min-height: 250px;
+  padding-top: 155px;
+}
+
+@media (max-width: 1000px) {
+  .landing-wash .hero {
+    min-height: 920px;
+  }
+
+  .hero-app-preview {
+    width: min(900px, calc(100% - 48px));
+    bottom: -120px;
+  }
+
+  .landing-wash .city-strip {
+    min-height: 230px;
+    padding-top: 130px;
+  }
+
+  .story-section,
+  .ranking-preview,
+  .district-ribbon,
+  .assistant-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .story-section {
+    gap: 18px;
+  }
+
+  .section-lead {
+    max-width: 680px;
+  }
+
+  .dimension-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ranking-preview,
+  .district-ribbon,
+  .assistant-banner {
+    gap: 42px;
+  }
+}
+
+@media (max-width: 700px) {
+  .header-inner {
+    padding-inline: 16px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .logo-mark {
+    width: 26px;
+    height: 21px;
+  }
+
+  .landing-wash .hero {
+    min-height: 680px;
+    padding: 32px 16px 210px;
+  }
+
+  .landing-wash .hero h1 {
+    font-size: clamp(34px, 10vw, 40px);
+  }
+
+  .landing-wash .hero-copy {
+    padding-inline: 0;
+  }
+
+  .landing-wash .hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .hero-app-preview {
+    width: calc(100% - 24px);
+    bottom: -50px;
+    border-radius: 13px;
+  }
+
+  .preview-bar {
+    height: 44px;
+    padding-inline: 12px;
+  }
+
+  .preview-body {
+    height: calc(100% - 44px);
+  }
+
+  .landing-wash .city-strip {
+    min-height: 210px;
+    margin-inline: 12px;
+    padding-top: 70px;
+  }
+
+  .home-content {
+    padding: 72px 16px;
+  }
+
+  .dimension-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dimension-grid article {
+    min-height: 0;
+  }
+
+  .featured-section,
+  .ranking-preview,
+  .district-ribbon,
+  .assistant-banner {
+    margin-top: 76px;
+  }
+
+  .featured-copy,
+  .district-ribbon,
+  .assistant-banner {
+    padding: 32px 20px;
+  }
+
+  .ranking-stack a {
+    grid-template-columns: 48px minmax(0, 1fr) auto 18px;
+  }
+
+  .district-bars {
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .district-bar-col {
+    flex: 0 0 72px;
+  }
+}
+
+@media (max-width: 420px) {
+  .preview-live-badge {
+    display: none;
+  }
+
+  .city-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* Kolom peta tidak boleh ikut melar mengikuti isinya. Elemen <canvas> punya
    ukuran bawaan dari atribut width/height-nya, jadi begitu kolomnya tidak
    dibatasi terjadi lingkaran setan: kanvas membesar, digambar ulang dengan
