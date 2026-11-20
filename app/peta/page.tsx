@@ -654,7 +654,7 @@ export default function MapPage() {
             </div>
           </div>
 
-          <LegendaPeta judulIndeks={currentTheme.label} />
+          <LegendaPeta />
           {petunjuk !== "hilang" && (
             <div className={petunjuk === "pudar" ? "map-hint pudar" : "map-hint"}>
               {viewMode === "3d"

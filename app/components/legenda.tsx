@@ -31,7 +31,7 @@ function DaftarSimbol({ judul, simbol }: { judul: string; simbol: Record<string,
   );
 }
 
-export function LegendaPeta({ judulIndeks }: { judulIndeks: string }) {
+export function LegendaPeta() {
   const [tab, setTab] = useState<Tab>("indeks");
   // Mulai tertutup supaya peta tidak langsung tertutup kartu saat dibuka.
   const [tampil, setTampil] = useState(false);
@@ -72,12 +72,14 @@ export function LegendaPeta({ judulIndeks }: { judulIndeks: string }) {
         </button>
       </div>
       <div className="legend-tab-isi" role="tabpanel" key={tab}>
-        {tab === "indeks" && <ScoreLegend title={judulIndeks} />}
+        {/* Tab di atasnya sudah bertuliskan "Indeks", jadi judul di dalam kartu
+            hanya mengulang. Judul kosong membuatnya tidak dirender. */}
+        {tab === "indeks" && <ScoreLegend title="" />}
         {tab === "fasilitas" && (
-          <>
-            <DaftarSimbol judul="Fasilitas Kesehatan" simbol={SIMBOL_FASKES} />
-            <DaftarSimbol judul="Fasilitas Pendidikan" simbol={SIMBOL_SEKOLAH} />
-          </>
+          <div className="legend-kolom">
+            <DaftarSimbol judul="Kesehatan" simbol={SIMBOL_FASKES} />
+            <DaftarSimbol judul="Pendidikan" simbol={SIMBOL_SEKOLAH} />
+          </div>
         )}
       </div>
     </div>

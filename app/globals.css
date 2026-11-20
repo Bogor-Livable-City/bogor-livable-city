@@ -130,7 +130,7 @@ h1,h2,h3,h4,p{margin:0}
 .legend-buka{position:absolute;bottom:24px;left:20px;z-index:500;display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 4px 12px rgba(23,59,56,.18);font-size:11px;font-weight:650;color:var(--ink);cursor:pointer;animation:legend-masuk .18s ease-out}
 .legend-buka:hover{border-color:var(--green);color:var(--green)}
 .legend-buka:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-.legend-tab-isi{padding:14px;min-height:179px;animation:legend-masuk .18s ease-out}
+.legend-tab-isi{padding:14px;min-height:165px;animation:legend-masuk .18s ease-out}
 @keyframes legend-masuk{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .legend-simbol-row{display:flex;align-items:center;gap:8px;font-size:10px;height:24px;color:var(--ink)}
 .legend-simbol-row>span{display:inline-flex;flex:0 0 auto}

@@ -276,9 +276,11 @@ export function ScoreLegend({
 
   return (
     <div className="legend-isi">
-      <div className="legend-title">
-        <span>{title}</span>
-      </div>
+      {title && (
+        <div className="legend-title">
+          <span>{title}</span>
+        </div>
+      )}
       <div className="legend-bar" />
       <div className="legend-values">
         <span>0,00</span>
