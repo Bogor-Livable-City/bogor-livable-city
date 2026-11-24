@@ -11,6 +11,10 @@ html, body {
      bottom .hero-app-preview di tiap breakpoint: 145 / 120 / 50. */
   padding: 0 0 145px;
   background: #fffefa;
+  /* Latar berhenti di kotak isi, jadi padding di atas hanya menampilkan warna
+     body. Tanpa ini padding tersebut ikut tercat #fffefa dan muncul sebagai
+     pita lebih terang di atas seksi berikutnya. */
+  background-clip: content-box;
 }
 .landing-wash:before,
 .landing-wash:after {
