@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { citySummary } from "../data";
 import { kelurahanData } from "../kelurahan-data";
 import { scoreToClass, scoreToColor, toSlug } from "../lib/livability";
 import { BogorMap, type MapDimensionKey } from "./map-visual";
@@ -146,77 +145,6 @@ export function HeroInteractivePreview() {
         </div>
       </div>
     </div>
-  );
-}
-
-export function AnimatedStatStrip() {
-  const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const stats = [
-    {
-      value: String(citySummary.totalKelurahan),
-      unit: "",
-      label: "Kelurahan terpetakan (RBI BIG)",
-    },
-    {
-      value: String(citySummary.totalKecamatan),
-      unit: "",
-      label: "Kecamatan di Kota Bogor",
-    },
-    {
-      value: String(citySummary.totalSchools),
-      unit: "unit",
-      label: "Sekolah SD, SMP & SMA/SMK",
-    },
-    {
-      value: citySummary.totalAreaKm2,
-      unit: "km²",
-      label: "Total luas wilayah terukur",
-    },
-    {
-      value: `${citySummary.avgFaskesPct}%`,
-      unit: "",
-      label: "Rata-rata cakupan layanan faskes",
-    },
-  ];
-
-  return (
-    <section
-      ref={ref}
-      aria-label="Ringkasan data Kota Bogor"
-      className={`city-strip ${visible ? "is-visible" : ""}`}
-    >
-      {stats.map((s, idx) => (
-        <div
-          key={s.label}
-          style={{ transitionDelay: `${idx * 65}ms` }}
-          className="strip-stat-item"
-        >
-          <b>
-            {s.value}
-            {s.unit && <small> {s.unit}</small>}
-          </b>
-          <span>{s.label}</span>
-        </div>
-      ))}
-    </section>
   );
 }
 

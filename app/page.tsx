@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  AnimatedStatStrip,
   HeroInteractivePreview,
   InteractiveDistrictRibbon,
   ScrollRevealEffects,
@@ -56,8 +55,6 @@ export default function Home() {
 
             <HeroInteractivePreview />
           </section>
-
-          <AnimatedStatStrip />
         </div>
 
         <div className="home-content">
