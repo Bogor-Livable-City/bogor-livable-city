@@ -91,7 +91,9 @@ html, body {
       rgba(255, 254, 250, 0.62) 0%,
       rgba(255, 254, 250, 0.14) 26%,
       rgba(255, 254, 250, 0) 58%,
-      rgba(23, 59, 56, 0.18) 100%
+      /* Dulu berakhir pada hijau gelap 0,18 dan menggelapkan dasar hero
+         selebar layar, mirip bayangan. Dibuat bening sampai habis. */
+      rgba(23, 59, 56, 0) 100%
     );
   pointer-events: none;
 }
@@ -210,9 +212,9 @@ html, body {
   backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: 18px 18px 12px 12px;
-  box-shadow:
-    0 26px 65px rgba(13, 48, 42, 0.28),
-    0 2px 0 rgba(255, 255, 255, 0.9) inset;
+  /* Tanpa drop shadow: bayangannya melebar jauh ke bawah kartu dan terbaca
+     sebagai pita kotor di atas seksi berikutnya. Garis tepi sudah cukup. */
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.9) inset;
   overflow: hidden;
   animation: preview-window-rise 0.95s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
   @media (prefers-reduced-motion: reduce) {
@@ -2806,6 +2808,11 @@ html[data-splash="done"] .rb-site-stage {
     width: 44px;
     height: 44px;
     flex: 0 0 44px;
+    /* Tanpa ini ikon SVG duduk di baseline teks tombol, jadi tampak turun
+       sedikit dari titik tengah. */
+    display: grid;
+    place-items: center;
+    padding: 0;
     border: 1px solid rgba(23, 59, 56, 0.2);
     border-radius: 10px;
     background: rgba(255, 254, 250, 0.94);
@@ -2950,4 +2957,12 @@ html[data-splash="done"] .rb-site-stage {
   width: auto;
   flex: 1;
   min-width: 0;
+}
+
+/* body memakai flex column, sehingga main dengan margin auto menyusut
+   mengikuti lebar isinya, bukan memakai max-width 1184px. Halaman statistik
+   kebetulan isinya selebar itu, peringkat dan perbandingan tidak, jadi
+   lebarnya terlihat berbeda. Lebar 100% menyamakan ketiganya. */
+.standard-page {
+  width: 100%;
 }
