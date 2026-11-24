@@ -9,14 +9,14 @@ import { BogorMap, type MapDimensionKey } from "./map-visual";
 import { BrandMark, Icon } from "./ui";
 
 const previewDimensions: { key: MapDimensionKey; label: string }[] = [
-  { key: "livable", label: "Indeks Total" },
+  { key: "livable", label: "Indeks Kelayakan" },
   { key: "kesehatan", label: "Kesehatan" },
+  { key: "pendidikan", label: "Pendidikan" },
+  { key: "sosial", label: "Sosial Kependudukan" },
   { key: "lingkungan", label: "Lingkungan" },
   { key: "transportasi", label: "Transportasi" },
-  { key: "pendidikan", label: "Pendidikan" },
+  { key: "ekonomi", label: "Ekonomi" },
 ];
-
-const quickPicks = ["pabaton", "babakan", "batutulis", "paledang", "bantarjati"];
 
 export function HeroInteractivePreview() {
   const [selectedSlug, setSelectedSlug] = useState("pabaton");
@@ -67,22 +67,6 @@ export function HeroInteractivePreview() {
             </button>
           ))}
         </nav>
-        <div className="preview-quick-chips" role="group" aria-label="Contoh kelurahan">
-          {quickPicks.map((slug) => {
-            const item = kelurahanData.find((k) => toSlug(k.kelurahan) === slug);
-            if (!item) return null;
-            return (
-              <button
-                key={slug}
-                type="button"
-                className={selectedSlug === slug ? "active" : ""}
-                onClick={() => setSelectedSlug(slug)}
-              >
-                #{item.peringkat} {item.kelurahan}
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       <div className="preview-body">
@@ -219,15 +203,6 @@ export function AnimatedStatStrip() {
       aria-label="Ringkasan data Kota Bogor"
       className={`city-strip ${visible ? "is-visible" : ""}`}
     >
-      <p>
-        <span className="strip-icon-badge" aria-hidden="true">
-          <Icon name="map" size={20} />
-        </span>
-        <span>
-          <strong>Geodatabase Kota Bogor</strong>
-          <small>Sumber: BIG, OSM, SIMDATA &amp; Kemendikbud</small>
-        </span>
-      </p>
       {stats.map((s, idx) => (
         <div
           key={s.label}

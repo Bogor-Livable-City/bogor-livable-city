@@ -38,7 +38,12 @@ html, body {
 
 /* HERO SECTION — Full-bleed elevated Bogor watercolor panorama */
 .landing-wash .hero {
-  display: block;
+  /* Teks hero dipusatkan terhadap ruang di atas kartu pratinjau, yang
+     posisinya absolut. Padding bawah yang menyediakan ruang itu ikut
+     berubah per breakpoint, jadi pemusatannya menyesuaikan sendiri. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-height: 850px;
   padding: 46px 40px 300px;
   position: relative;
@@ -267,28 +272,6 @@ html, body {
   background: #fffefa;
   color: var(--green);
   box-shadow: 0 2px 6px rgba(14, 91, 83, 0.12);
-}
-
-.preview-quick-chips {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.preview-quick-chips button {
-  border: 1px solid var(--line);
-  background: #fffefa;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  white-space: nowrap;
-}
-.preview-quick-chips button:hover,
-.preview-quick-chips button.active {
-  border-color: var(--green);
-  background: var(--green);
-  color: #fff;
 }
 
 .preview-body {
@@ -525,27 +508,6 @@ html, body {
   min-height: 146px;
   padding: 72px 24px 18px;
   margin: 0 auto;
-}
-.strip-icon-badge {
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  background: #e3efe9;
-  color: var(--green);
-  display: grid;
-  place-items: center;
-  flex: 0 0 40px;
-}
-.city-strip p span strong {
-  display: block;
-  font-size: 14px;
-}
-.city-strip p span small {
-  display: block;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--muted);
-  margin-top: 2px;
 }
 .strip-stat-item {
   opacity: 0;
@@ -1022,9 +984,6 @@ html, body {
   .hero-app-preview {
     width: 92%;
   }
-  .preview-quick-chips {
-    display: none;
-  }
 }
 
 @media (max-width: 700px) {
@@ -1444,14 +1403,10 @@ html[data-splash="done"] .rb-site-stage {
   background: #e3efe9;
 }
 
+/* Dulu kartu pertama melebar dua kolom, sehingga baris pertama hanya memuat
+   dua kartu dan sisanya turun. Sekarang seluruhnya seukuran, tiga per baris. */
 .dimension-card-lead {
-  grid-column: span 2;
   background: #f3f7f4 !important;
-}
-@media (max-width: 700px) {
-  .dimension-card-lead {
-    grid-column: span 1;
-  }
 }
 
 /* Minimum readable typography & 44px touch targets */
