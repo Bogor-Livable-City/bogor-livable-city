@@ -8,9 +8,39 @@
 //   GEMINI_API_KEY  wajib, dari https://aistudio.google.com/apikey
 //   GEMINI_MODEL    opsional, bawaannya gemini-3.5-flash-lite
 
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { NextResponse } from "next/server";
 import { kelurahanData } from "../../kelurahan-data";
 import { fmt } from "../../lib/livability";
+
+/** Nama fasilitas per kelurahan, dibaca sekali saat modul dimuat. */
+function muatTitik(berkas: string): Map<string, string[]> {
+  const peta = new Map<string, string[]>();
+  try {
+    const isi = readFileSync(
+      join(process.cwd(), "public", "data", `${berkas}.geojson`),
+      "utf8"
+    );
+    const fitur = JSON.parse(isi).features as {
+      properties: { nama?: string; kelurahan?: string };
+    }[];
+    for (const { properties } of fitur) {
+      const { nama, kelurahan } = properties;
+      if (!nama || !kelurahan) continue;
+      const daftar = peta.get(kelurahan);
+      if (daftar) daftar.push(nama);
+      else peta.set(kelurahan, [nama]);
+    }
+  } catch (e) {
+    // Kalau berkasnya tidak terbaca, asisten tetap jalan tanpa daftar ini.
+    console.error(`Gagal membaca ${berkas}.geojson:`, e);
+  }
+  return peta;
+}
+
+const FASKES = muatTitik("faskes");
+const SEKOLAH = muatTitik("sekolah");
 
 const MODEL_BAWAAN = "gemini-3.5-flash-lite";
 
@@ -35,6 +65,9 @@ Jangan pernah menyuruh pengguna memeriksa sendiri di Google Maps atau aplikasi l
 
 Angka indeks, skor, peringkat, penduduk, luas, dan jumlah sarana selalu diambil dari DATA PROYEK di bawah, bukan dari hasil pencarian.
 
+Kalau ditanya apakah suatu tempat punya puskesmas, rumah sakit, klinik, atau sekolah, dan yang disebut bukan nama kelurahan melainkan nama jalan, kawasan, atau patokan: tentukan dulu tempat itu masuk kelurahan mana, lalu baca daftar fasilitas kelurahan tersebut di DATA PROYEK dan sebutkan namanya. Katakan di kelurahan mana kamu mencarinya.
+Daftar itu hasil pendataan proyek ini, bukan sensus seluruh kota. Kalau kelurahannya tercatat tidak punya, katakan tidak ada yang terdata di sana, bukan tidak ada sama sekali.
+
 Dua hal yang tetap di luar kemampuanmu:
 - Menghitung jarak antartitik. Arahkan ke halaman peta.
 - Ada Kelurahan Curug di Kota Bogor, dan itu bukan air terjun. Jangan tertukar.
@@ -49,6 +82,26 @@ function tabelRingkas(): string {
       (k) =>
         `${k.peringkat}. ${k.kelurahan} (${k.kecamatan}) skor ${fmt(k.skor_livable)} ${k.kelas}`
     )
+    .join("\n");
+}
+
+/** Nama tiap fasilitas, dikelompokkan per kelurahan.
+ *
+ *  Tanpa daftar ini model hanya menerima jumlahnya, sehingga pertanyaan
+ *  "di X ada puskesmas tidak" tidak bisa dijawab. Nama jalan juga tidak ada di
+ *  data proyek; yang bisa memetakan jalan ke kelurahan hanya pengetahuan umum
+ *  model, lalu kelurahan itu dicocokkan ke daftar ini. */
+function daftarFasilitas(): string {
+  const kelurahan = [...new Set([...FASKES.keys(), ...SEKOLAH.keys()])].sort();
+  return kelurahan
+    .map((k) => {
+      const kesehatan = FASKES.get(k) ?? [];
+      const sekolah = SEKOLAH.get(k) ?? [];
+      return (
+        `${k} | kesehatan: ${kesehatan.join(", ") || "tidak ada yang terdata"}` +
+        ` | sekolah: ${sekolah.join(", ") || "tidak ada yang terdata"}`
+      );
+    })
     .join("\n");
 }
 
@@ -93,7 +146,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ jawaban: "Pertanyaannya kosong." }, { status: 400 });
   }
 
-  const konteks = `Peringkat 68 kelurahan Kota Bogor menurut indeks kelayakhunian:\n${tabelRingkas()}${rincianDisebut(pertanyaan)}`;
+  const konteks =
+    `Peringkat 68 kelurahan Kota Bogor menurut indeks kelayakhunian:\n${tabelRingkas()}` +
+    `\n\nFasilitas terdata per kelurahan:\n${daftarFasilitas()}` +
+    rincianDisebut(pertanyaan);
   const model = process.env.GEMINI_MODEL || MODEL_BAWAAN;
   const grounding = process.env.GEMINI_GROUNDING === "1";
 
@@ -156,5 +212,9 @@ export async function GET() {
     sumber: process.env.GEMINI_MODEL ? "GEMINI_MODEL di Vercel" : "bawaan kode",
     kunciTerpasang: Boolean(process.env.GEMINI_API_KEY),
     grounding: process.env.GEMINI_GROUNDING === "1",
+    // Supaya bisa dipastikan berkas geojson ikut terbaca di server Vercel
+    // tanpa harus memakai kuota Gemini.
+    faskesTerbaca: [...FASKES.values()].reduce((n, v) => n + v.length, 0),
+    sekolahTerbaca: [...SEKOLAH.values()].reduce((n, v) => n + v.length, 0),
   });
 }
