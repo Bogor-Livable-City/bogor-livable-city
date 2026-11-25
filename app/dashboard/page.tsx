@@ -19,12 +19,6 @@ export default function DashboardPage() {
         eyebrow="Statistik kota"
         title="Bogor dalam angka."
         description="Ringkasan kondisi kelayakhunian 68 kelurahan dan enam kecamatan berdasarkan data spasial dan atribut terbaru."
-        action={
-          <a className="quiet-button" href="/data/kelurahan.geojson" download>
-            <Icon name="download" />
-            Unduh GeoJSON
-          </a>
-        }
       />
 
       <section className="stat-cards">

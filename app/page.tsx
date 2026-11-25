@@ -73,7 +73,11 @@ export default function Home() {
                 <article
                   key={d.key}
                   className={`dimension-card reveal-on-scroll ${
-                    i === 0 ? "dimension-card-lead" : ""
+                    i === 0 ||
+                    d.key === "skor_sosial" ||
+                    d.key === "skor_transportasi"
+                      ? "dimension-card-lead"
+                      : ""
                   }`}
                   style={{ animationDelay: `${i * 60}ms` }}
                 >

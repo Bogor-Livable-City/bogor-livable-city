@@ -1015,6 +1015,17 @@ html, body {
   }
 }
 
+/* Revisi 25 November 2026: samakan detail visual tanpa mengubah layout lain. */
+.stat-primary small {
+  color: inherit;
+}
+
+@media (min-width: 1001px) {
+  html:has(.assistant-page) {
+    overflow-y: scroll;
+  }
+}
+
 /* =========================================================
    RUANG BOGOR SPLASH LOADER (Minimalist Editorial Curtain)
    ========================================================= */
@@ -1937,6 +1948,11 @@ html[data-splash="done"] .rb-site-stage {
 }
 
 @media (max-width: 700px) {
+  .landing-wash {
+    min-height: 0;
+    padding-bottom: 0;
+  }
+
   .header-inner {
     padding-inline: 16px;
   }
@@ -1951,10 +1967,8 @@ html[data-splash="done"] .rb-site-stage {
   }
 
   .landing-wash .hero {
-    min-height: 680px;
-    /* Tanpa padding atas, supaya .hero-copy yang setinggi layar benar-benar
-       mulai dari bawah header dan isinya jatuh tepat di tengah. */
-    padding: 0 16px 210px;
+    min-height: 0;
+    padding: 28px 16px 48px;
   }
 
   .landing-wash .hero h1 {
@@ -1962,7 +1976,9 @@ html[data-splash="done"] .rb-site-stage {
   }
 
   .landing-wash .hero-copy {
-    padding-inline: 0;
+    min-height: 0;
+    top: auto;
+    padding: 0;
   }
 
   .landing-wash .hero-actions {
@@ -1971,8 +1987,10 @@ html[data-splash="done"] .rb-site-stage {
   }
 
   .hero-app-preview {
+    position: relative;
     width: calc(100% - 24px);
-    bottom: -50px;
+    margin-top: 32px;
+    bottom: auto;
     border-radius: 13px;
   }
 

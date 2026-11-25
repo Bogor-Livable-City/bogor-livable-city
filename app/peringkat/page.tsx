@@ -62,12 +62,6 @@ export default function RankingPage() {
         eyebrow="Peringkat wilayah"
         title="Urutan 68 kelurahan berdasarkan indeks kelayakhunian."
         description="Gunakan pencarian atau filter kecamatan dan kelas untuk menyaring wilayah, lalu klik nama kelurahan untuk melihat rincian indikatornya."
-        action={
-          <a className="button" href="/data/kelurahan.geojson" download>
-            <Icon name="download" />
-            Unduh GeoJSON
-          </a>
-        }
       />
 
       <section className="ranking-summary">
