@@ -47,12 +47,6 @@ export default function DataPage() {
       <AdminHeader
         title="Data indikator."
         description={`Tinjau dan perbarui nilai mentah untuk setiap kelurahan pada ${selectedPeriod} (68 kelurahan Kota Bogor).`}
-        action={
-          <a className="button" href="/data/kelurahan.geojson" download>
-            <Icon name="download" />
-            Unduh Data GeoJSON
-          </a>
-        }
       />
       <div className="data-toolbar">
         <label>
