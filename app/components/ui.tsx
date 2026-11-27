@@ -293,32 +293,15 @@ export function PageShell({
 
 export function Footer() {
   return (
-    <footer className="footer">
-      <div>
-        <Logo light />
-        <p>
-          Atlas WebGIS kelayakhunian 68 kelurahan dan 6 kecamatan di Kota Bogor.
-        </p>
-      </div>
-      <div>
-        <span>Halaman analisis</span>
-        <Link href="/peta">Peta 68 kelurahan</Link>
-        <Link href="/peringkat">Tabel peringkat wilayah</Link>
-        <Link href="/perbandingan">Bandingkan dua wilayah</Link>
-      </div>
-      <div>
-        <span>Rujukan &amp; metode</span>
-        <Link href="/metodologi">Metodologi perhitungan</Link>
-        <Link href="/metodologi#sumber">Daftar 12 indikator &amp; sumber</Link>
-        <Link href="/dashboard">Statistik agregat kota</Link>
-      </div>
-      <div className="footer-note">
-        <Icon name="map" />
-        <p>
-          Sumber: RBI BIG, OpenStreetMap, SIMDATA Kota Bogor &amp; Kemendikbud
-          (Data 2023 sampai 2026)
-        </p>
-      </div>
+    // Daftar halamannya diambil dari nav yang sama dengan header, jadi menu
+    // baru cukup ditambahkan di satu tempat.
+    <footer className="footer" aria-label="Navigasi footer">
+      <Link href="/">Landing Page</Link>
+      {nav.map(([href, label]) => (
+        <Link key={href} href={href}>
+          {label}
+        </Link>
+      ))}
     </footer>
   );
 }
